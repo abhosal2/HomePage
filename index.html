@@ -4,14 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Aryan | Home</title>
-  <!-- Tron‑like font -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#05060f;             /* deep space */
-      --grid:#0b1630;           /* dim grid line */
-      --neon-blue:#24c8ff;      /* cyan glow */
-      --neon-red:#ff3b4e;       /* red glow */
+      --bg:#05060f;
+      --grid:#0b1630;
+      --neon-blue:#24c8ff;
+      --neon-red:#ff3b4e;
       --text:#e9f3ff;
       --maxw: 1000px;
     }
@@ -20,22 +19,20 @@
     html,body{height:100%}
     body{
       margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       color:var(--text);
       background: var(--bg);
-      overflow:hidden; /* keep the effect full-bleed */
+      overflow:hidden;
     }
 
-    /* ===== BACKGROUND LAYERS ===== */
     .scene{
       position:fixed; inset:0; overflow:hidden;
-      perspective: 900px;  /* subtle 3D for the grid floor */
+      perspective: 900px;
       background: radial-gradient(1200px 800px at 20% 10%, rgba(36,200,255,.06), transparent 60%),
                   radial-gradient(1100px 780px at 85% 20%, rgba(255,59,78,.06), transparent 60%),
                   radial-gradient(1000px 700px at 50% 120%, rgba(36,200,255,.05), transparent 70%);
     }
 
-    /* Starfield / dust */
     .stars, .stars:before, .stars:after{
       content:""; position:absolute; inset:-20%;
       background-image: radial-gradient(rgba(255,255,255,.12) 1px, transparent 1px);
@@ -44,10 +41,8 @@
     }
     .stars:before{opacity:.25; filter:blur(.5px); animation-duration: 160s}
     .stars:after{opacity:.08; filter:blur(1px); animation-duration: 200s}
-
     @keyframes drift{to{transform:translate3d(-200px, -120px, 0)}}
 
-    /* Neon light sweeps */
     .sweeps{
       position:absolute; inset:0; pointer-events:none; mix-blend-mode: screen;
       background:
@@ -60,7 +55,6 @@
       100%{transform:translate3d(6%, 5%, 0)}
     }
 
-    /* Tron grid floor */
     .grid{
       position:absolute; left:-5vw; right:-5vw; bottom:-15vh; height:80vh;
       transform: rotateX(62deg) translateZ(-200px);
@@ -85,7 +79,6 @@
     }
     @keyframes gridPulse{ 50%{opacity:.38} }
 
-    /* Scanline across the whole scene */
     .scanline{
       position:absolute; inset:0; pointer-events:none;
       background: linear-gradient(to bottom, transparent, rgba(255,255,255,.06), transparent);
@@ -94,7 +87,6 @@
     }
     @keyframes scan{ to{background-position-y: 180px} }
 
-    /* ===== CONTENT ===== */
     .wrap{ position:relative; z-index:10; min-height:100dvh; display:grid; place-items:center; text-align:center; padding: clamp(16px, 3vw, 40px); }
 
     .card{
@@ -108,7 +100,7 @@
     }
 
     h1{
-      font-family: 'Orbitron', ui-sans-serif, system-ui;
+      font-family: 'Orbitron', ui-sans-serif;
       font-weight:900; letter-spacing:.04em; line-height:1.02;
       font-size: clamp(36px, 8vw, 86px);
       margin: 0 0 16px;
@@ -121,7 +113,7 @@
     }
 
     .subtitle{
-      font-family: 'Orbitron', ui-sans-serif, system-ui; letter-spacing:.12em; text-transform:uppercase;
+      font-family: 'Orbitron', ui-sans-serif; letter-spacing:.12em; text-transform:uppercase;
       opacity:.88; margin-bottom: 28px; font-size: clamp(12px, 2.6vw, 16px);
     }
 
@@ -151,13 +143,17 @@
 
     .footer{ margin-top: 20px; opacity:.7; font-size: 12px }
 
-    /* Small helper: respect reduced motion */
     @media (prefers-reduced-motion: reduce){
       .sweeps, .grid-lines, .scanline, .stars{ animation: none !important }
     }
   </style>
 </head>
 <body>
+  <!-- Background Music -->
+  <audio autoplay loop volume="0.1">
+    <source src="end_of_line.mp3" type="audio/mpeg">
+  </audio>
+
   <div class="scene" aria-hidden="true">
     <div class="stars"></div>
     <div class="sweeps"></div>
@@ -172,12 +168,11 @@
       <h1>Welcome back, Aryan</h1>
       <p class="subtitle">SYSTEM ONLINE · ACCESS YOUR HUB</p>
       <nav class="cta" aria-label="Primary">
-        <!-- Update links if you use different accounts -->
         <a class="btn blue" href="https://calendar.google.com/" target="_blank" rel="noopener">Google Calendar</a>
         <a class="btn red" href="https://outlook.office.com/" target="_blank" rel="noopener">Outlook</a>
         <a class="btn" href="#home" onclick="location.reload();return false;">Home</a>
       </nav>
-      <p class="footer">Tip: replace the Outlook URL if you use Outlook Live (<code>https://outlook.live.com/</code>) or a school/work tenant.</p>
+      <p class="footer">Music: “End of Line” — Daft Punk (Tron Legacy OST). Make sure to include your own local or royalty‑free version as <code>end_of_line.mp3</code>.</p>
     </section>
   </main>
 </body>
