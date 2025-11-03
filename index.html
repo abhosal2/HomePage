@@ -146,9 +146,29 @@
     @media (prefers-reduced-motion: reduce){
       .sweeps, .grid-lines, .scanline, .stars{ animation: none !important }
     }
+      .audio-toggle{
+      position: fixed; right: 16px; bottom: 16px; z-index: 20;
+      width: 44px; height: 44px; border-radius: 12px; border:1px solid rgba(36,200,255,.45);
+      background: linear-gradient( to bottom, rgba(8,26,46,.9), rgba(6,16,34,.85) );
+      color: var(--text); font-size: 18px; cursor: pointer;
+      box-shadow: 0 0 16px rgba(36,200,255,.22) inset, 0 0 24px rgba(36,200,255,.16);
+      transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .audio-toggle:hover{ transform: translateY(-1px); border-color: rgba(255,59,78,.6); box-shadow: 0 0 18px rgba(255,59,78,.25), 0 0 28px rgba(36,200,255,.28) inset; }
+    .audio-toggle:active{ transform: translateY(0); }
   </style>
+  <script>
+    // Accessibility helpers will be added after DOM loads
+  </script>
 </head>
 <body>
+  <!-- Background Music (user-activated due to browser autoplay policies) -->
+  <audio id="bgm" preload="auto" loop>
+    <source src="end_of_line.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Small on-screen audio toggle -->
+  <button id="audioToggle" class="audio-toggle" aria-label="Play background music" aria-pressed="false" title="Toggle music (End of Line – Daft Punk)">🔇</button>
   <!-- Background Music -->
   <audio autoplay loop volume="0.1">
     <source src="end_of_line.mp3" type="audio/mpeg">
@@ -175,5 +195,49 @@
       <p class="footer">Music: “End of Line” — Daft Punk (Tron Legacy OST). Make sure to include your own local or royalty‑free version as <code>end_of_line.mp3</code>.</p>
     </section>
   </main>
+  <script>
+    (function(){
+      const btn = document.getElementById('audioToggle');
+      const audio = document.getElementById('bgm');
+      if(!btn || !audio) return;
+
+      // Set desired volume
+      audio.volume = 0.12; // ~12% volume
+
+      // Try to start silently (some browsers allow muted autoplay)
+      audio.muted = true;
+      audio.play().catch(()=>{/* expected until user interacts */});
+
+      function updateIcon(){
+        const playing = !audio.paused;
+        btn.textContent = playing ? '🔊' : '🔇';
+        btn.setAttribute('aria-pressed', playing ? 'true' : 'false');
+        btn.setAttribute('aria-label', playing ? 'Pause background music' : 'Play background music');
+      }
+
+      btn.addEventListener('click', async () => {
+        try{
+          if(audio.paused){
+            audio.muted = false; // unmute when user interacts
+            audio.volume = 0.12;
+            await audio.play();
+          }else{
+            audio.pause();
+          }
+        }catch(e){
+          console.warn('Audio toggle error:', e);
+        }
+        updateIcon();
+      });
+
+      // Keyboard accessibility
+      btn.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); btn.click(); }
+      });
+
+      // Initialize icon state
+      updateIcon();
+    })();
+  </script>
 </body>
 </html>
