@@ -263,5 +263,26 @@
       }
     })();
   </script>
+  <script>
+    // --- SAFETY SWITCH ---
+    (function(){
+      function endIntroNow(){
+        var intro = document.getElementById('intro');
+        if(intro){ intro.classList.add('intro--hide'); intro.style.display = 'none'; }
+        document.body.style.overflow = 'auto';
+      }
+      // Allow ?nointro=1 or #safe to bypass
+      if(location.search.indexOf('nointro=1')!==-1 || location.hash.indexOf('safe')!==-1){ endIntroNow(); }
+      // If nothing appears within 2000ms, hide the intro automatically
+      setTimeout(function(){
+        var w = window.innerWidth || 0, h = window.innerHeight || 0;
+        var intro = document.getElementById('intro');
+        // If intro still visible and taking full screen, collapse it
+        if(intro && intro.offsetParent !== null){ endIntroNow(); }
+      }, 2000);
+      // If any runtime error occurs, also bail out of intro
+      window.addEventListener('error', endIntroNow);
+    })();
+  </script>
 </body>
 </html>
