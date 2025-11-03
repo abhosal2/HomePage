@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aryan | Home</title>
+  <!-- Tron‑like font -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#05060f;             /* deep space */
+      --grid:#0b1630;           /* dim grid line */
+      --neon-blue:#24c8ff;      /* cyan glow */
+      --neon-red:#ff3b4e;       /* red glow */
+      --text:#e9f3ff;
+      --maxw: 1000px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background: var(--bg);
+      overflow:hidden; /* keep the effect full-bleed */
+    }
+
+    /* ===== BACKGROUND LAYERS ===== */
+    .scene{
+      position:fixed; inset:0; overflow:hidden;
+      perspective: 900px;  /* subtle 3D for the grid floor */
+      background: radial-gradient(1200px 800px at 20% 10%, rgba(36,200,255,.06), transparent 60%),
+                  radial-gradient(1100px 780px at 85% 20%, rgba(255,59,78,.06), transparent 60%),
+                  radial-gradient(1000px 700px at 50% 120%, rgba(36,200,255,.05), transparent 70%);
+    }
+
+    /* Starfield / dust */
+    .stars, .stars:before, .stars:after{
+      content:""; position:absolute; inset:-20%;
+      background-image: radial-gradient(rgba(255,255,255,.12) 1px, transparent 1px);
+      background-size: 3px 3px; opacity:.15;
+      animation: drift 120s linear infinite;
+    }
+    .stars:before{opacity:.25; filter:blur(.5px); animation-duration: 160s}
+    .stars:after{opacity:.08; filter:blur(1px); animation-duration: 200s}
+
+    @keyframes drift{to{transform:translate3d(-200px, -120px, 0)}}
+
+    /* Neon light sweeps */
+    .sweeps{
+      position:absolute; inset:0; pointer-events:none; mix-blend-mode: screen;
+      background:
+        radial-gradient(400px 220px at -10% 60%, rgba(36,200,255,.25), transparent 65%),
+        radial-gradient(380px 220px at 110% 40%, rgba(255,59,78,.22), transparent 65%);
+      animation: sweepMove 14s ease-in-out infinite alternate;
+    }
+    @keyframes sweepMove{
+      0%{transform:translate3d(-6%, -4%, 0)}
+      100%{transform:translate3d(6%, 5%, 0)}
+    }
+
+    /* Tron grid floor */
+    .grid{
+      position:absolute; left:-5vw; right:-5vw; bottom:-15vh; height:80vh;
+      transform: rotateX(62deg) translateZ(-200px);
+      transform-origin: top center; filter: drop-shadow(0 0 12px rgba(36,200,255,.25));
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 50px 50px; background-position: center;
+    }
+    .grid:before{
+      content:""; position:absolute; inset:0;
+      background:
+        radial-gradient(600px 120px at 50% 0%, rgba(36,200,255,.18), transparent 70%),
+        radial-gradient(500px 110px at 50% 10%, rgba(255,59,78,.12), transparent 75%);
+      pointer-events:none;
+    }
+    .grid-lines{
+      position:absolute; inset:0; background: repeating-linear-gradient( to bottom, transparent 0 48px, rgba(36,200,255,.5) 49px 50px );
+      -webkit-mask: linear-gradient(to top, transparent, black 30%);
+              mask: linear-gradient(to top, transparent, black 30%);
+      mix-blend-mode: screen; opacity:.25; animation: gridPulse 2.6s ease-in-out infinite;
+    }
+    @keyframes gridPulse{ 50%{opacity:.38} }
+
+    /* Scanline across the whole scene */
+    .scanline{
+      position:absolute; inset:0; pointer-events:none;
+      background: linear-gradient(to bottom, transparent, rgba(255,255,255,.06), transparent);
+      background-size: 100% 180px; animation: scan 4.2s linear infinite;
+      mix-blend-mode: screen;
+    }
+    @keyframes scan{ to{background-position-y: 180px} }
+
+    /* ===== CONTENT ===== */
+    .wrap{ position:relative; z-index:10; min-height:100dvh; display:grid; place-items:center; text-align:center; padding: clamp(16px, 3vw, 40px); }
+
+    .card{
+      width:min(92vw, var(--maxw));
+      backdrop-filter: blur(8px) saturate(120%);
+      background: rgba(5,8,18,.45);
+      border: 1px solid rgba(36,200,255,.18);
+      border-radius: 22px;
+      box-shadow: 0 0 40px rgba(36,200,255,.12), 0 0 80px rgba(255,59,78,.08) inset;
+      padding: clamp(20px, 5vw, 56px);
+    }
+
+    h1{
+      font-family: 'Orbitron', ui-sans-serif, system-ui;
+      font-weight:900; letter-spacing:.04em; line-height:1.02;
+      font-size: clamp(36px, 8vw, 86px);
+      margin: 0 0 16px;
+      text-transform: uppercase;
+      color: var(--text);
+      text-shadow:
+        0 0 6px rgba(36,200,255,.65),
+        0 0 18px rgba(36,200,255,.35),
+        0 0 36px rgba(255,59,78,.2);
+    }
+
+    .subtitle{
+      font-family: 'Orbitron', ui-sans-serif, system-ui; letter-spacing:.12em; text-transform:uppercase;
+      opacity:.88; margin-bottom: 28px; font-size: clamp(12px, 2.6vw, 16px);
+    }
+
+    .cta{
+      display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:center;
+    }
+
+    .btn{
+      --h: 52px;
+      height: var(--h); padding: 0 22px; border-radius: 14px;
+      display:inline-grid; place-items:center; text-decoration:none; position:relative;
+      font-family:'Orbitron', ui-sans-serif; font-weight:700; letter-spacing:.06em;
+      color: var(--text); isolation:isolate;
+      border:1px solid rgba(36,200,255,.45);
+      box-shadow: 0 0 16px rgba(36,200,255,.22) inset, 0 0 24px rgba(36,200,255,.16);
+      transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+      background: linear-gradient( to bottom, rgba(8,26,46,.7), rgba(6,16,34,.6) );
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(255,59,78,.6); box-shadow: 0 0 18px rgba(255,59,78,.25), 0 0 28px rgba(36,200,255,.28) inset; }
+    .btn:active{ transform: translateY(0); }
+
+    .btn.blue:before, .btn.red:before{
+      content:""; position:absolute; inset:-2px; border-radius:inherit; z-index:-1; filter: blur(10px);
+    }
+    .btn.blue:before{ background: radial-gradient(60% 120% at 50% 80%, rgba(36,200,255,.45), transparent 70%); }
+    .btn.red:before{ background: radial-gradient(60% 120% at 50% 80%, rgba(255,59,78,.45), transparent 70%); }
+
+    .footer{ margin-top: 20px; opacity:.7; font-size: 12px }
+
+    /* Small helper: respect reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      .sweeps, .grid-lines, .scanline, .stars{ animation: none !important }
+    }
+  </style>
+</head>
+<body>
+  <div class="scene" aria-hidden="true">
+    <div class="stars"></div>
+    <div class="sweeps"></div>
+    <div class="grid">
+      <div class="grid-lines"></div>
+    </div>
+    <div class="scanline"></div>
+  </div>
+
+  <main class="wrap">
+    <section class="card" role="region" aria-label="Welcome">
+      <h1>Welcome back, Aryan</h1>
+      <p class="subtitle">SYSTEM ONLINE · ACCESS YOUR HUB</p>
+      <nav class="cta" aria-label="Primary">
+        <!-- Update links if you use different accounts -->
+        <a class="btn blue" href="https://calendar.google.com/" target="_blank" rel="noopener">Google Calendar</a>
+        <a class="btn red" href="https://outlook.office.com/" target="_blank" rel="noopener">Outlook</a>
+        <a class="btn" href="#home" onclick="location.reload();return false;">Home</a>
+      </nav>
+      <p class="footer">Tip: replace the Outlook URL if you use Outlook Live (<code>https://outlook.live.com/</code>) or a school/work tenant.</p>
+    </section>
+  </main>
+</body>
+</html>
