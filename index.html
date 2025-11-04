@@ -39,16 +39,24 @@
       filter: drop-shadow(0 0 8px var(--grid-blue)) drop-shadow(0 0 6px var(--grid-red));
     }
 
-    /* Light snake moving through the grid */
+    /* Light snake moving through the grid (capsule + trailing segments) */
+    .snakes{ position:absolute; inset:0; }
     .snake{
-      position:absolute; width:16px; height:16px; border-radius:50%; left:0; top:0;
-      background: radial-gradient(circle, #fff 0 25%, #9be7ff 45%, rgba(36,200,255,.0) 70%);
-      box-shadow: 0 0 14px rgba(36,200,255,.9), 0 0 24px rgba(36,200,255,.6), 0 0 32px rgba(255,59,78,.35);
-      offset-path: path('M 40 560 L 960 560 L 960 520 L 40 520 L 40 480 L 960 480 L 960 440 L 40 440 L 40 400 L 960 400 L 960 360 L 40 360 L 40 320 L 960 320 L 960 280 L 40 280 L 40 240 L 960 240 L 960 200 L 40 200');
-      offset-rotate: 0deg; transform: translate(-8px,-8px);
-      animation: snakeMove 25s linear infinite;
+      position:absolute; width:120px; height:12px; border-radius:999px; left:0; top:0;
+      background: radial-gradient(60% 120% at 35% 50%, rgba(255,255,255,.95) 0 25%, #9be7ff 35%, rgba(36,200,255,.2) 65%, rgba(36,200,255,0) 80%);
+      box-shadow: 0 0 16px rgba(36,200,255,.9), 0 0 28px rgba(36,200,255,.6), 0 0 36px rgba(255,59,78,.35);
+      offset-path: path('M 40 560 L 960 560 L 960 520 L 40 520 L 40 480 L 960 480 L 960 440 L 40 440 L 40 400 L 960 400 L 960 360 L 40 360 L 40 320 L 960 320 L 960 280 L 40 280 L 40 240 L 960 240 L 960 200 L 40 200 L 40 160 L 960 160 L 960 120 L 40 120');
+      offset-rotate: auto; transform: translate(-60px,-6px);
+      animation: snakeMove 26s linear infinite;
     }
-    @keyframes snakeMove { to { offset-distance: 100%; } }
+    /* trailing segments with delays and lighter opacity */
+    .snake.seg1{ filter: blur(0.5px); opacity:.85; animation-delay:-0.6s }
+    .snake.seg2{ filter: blur(1px); opacity:.65; animation-delay:-1.2s }
+    .snake.seg3{ filter: blur(1.5px); opacity:.45; animation-delay:-1.8s }
+    .snake.seg4{ filter: blur(2px); opacity:.3; animation-delay:-2.4s }
+    .snake.seg5{ filter: blur(2.5px); opacity:.18; animation-delay:-3.0s }
+
+    @keyframes snakeMove { to { offset-distance: 100%; } } }
 
     @media (prefers-reduced-motion: reduce){ .snake{ animation:none } }
 
@@ -115,7 +123,26 @@
 <body>
   <div class="grid" aria-hidden="true">
     <div class="grid__plane">
-      <div class="snake" aria-hidden="true"></div>
+      <!-- Serpentine path that traverses ALL visible rows -->
+      <svg class="grid__snake" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" aria-hidden="true" style="position:absolute; inset:0;">
+        <defs>
+          <linearGradient id="snakeGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#24c8ff"/>
+            <stop offset="100%" stop-color="#ff3b4e"/>
+          </linearGradient>
+        </defs>
+        <path id="snakePath" d="M 40 560 L 960 560 L 960 520 L 40 520 L 40 480 L 960 480 L 960 440 L 40 440 L 40 400 L 960 400 L 960 360 L 40 360 L 40 320 L 960 320 L 960 280 L 40 280 L 40 240 L 960 240 L 960 200 L 40 200 L 40 160 L 960 160 L 960 120 L 40 120" stroke="url(#snakeGlow)" stroke-width="2" opacity="0.05" fill="none"/>
+      </svg>
+      <!-- Multi-segment light snake (capsule with trailing segments) -->
+      <div class="snakes" aria-hidden="true">
+        <div class="snake seg0"></div>
+        <div class="snake seg1"></div>
+        <div class="snake seg2"></div>
+        <div class="snake seg3"></div>
+        <div class="snake seg4"></div>
+        <div class="snake seg5"></div>
+      </div>
+    </div>
     </div>
   </div>
 
