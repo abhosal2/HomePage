@@ -26,24 +26,15 @@
     /* Full-screen Tron grid (blue + red) */
     .grid{ position:fixed; inset:0; z-index:-1; perspective: 900px; background: #05060f; }
     .grid__plane{
-      position:absolute; left:-8vw; right:-8vw; bottom:-30vh; height:110vh;
-      transform: rotateX(58deg) translateZ(-150px);
+      position:absolute; left:-12vw; right:-12vw; bottom:-50vh; height:140vh;
+      transform: rotateX(55deg) translateZ(-120px);
       transform-origin: top center;
       background-image:
         linear-gradient(var(--grid-blue) 1px, transparent 1px),
         linear-gradient(90deg, var(--grid-red) 1px, transparent 1px);
       background-size: 50px 50px; background-position: center;
       filter: drop-shadow(0 0 8px var(--grid-blue)) drop-shadow(0 0 6px var(--grid-red));
-    }
-
-    .grid__scan{ position:absolute; inset:-10% -20%; pointer-events:none; mix-blend-mode: screen; opacity:.45;
-      background:
-        radial-gradient(420px 160px at 0% 55%, rgba(36,200,255,.22), transparent 65%),
-        radial-gradient(420px 160px at 0% 45%, rgba(255,59,78,.18), transparent 70%);
-      transform: translateX(-30%);
-      animation: scanMove 12s linear infinite;
-    }
-    @keyframes scanMove{ to{ transform: translateX(130%) } }
+    } }
 
     .wrap{ position:relative; z-index:10; height:100vh; display:grid; place-items:center; text-align:center; padding:40px; }
 
@@ -106,12 +97,35 @@
     }
     .audio-toggle:hover{ transform: translateY(-1px); border-color: rgba(36,200,255,.8); box-shadow: 0 0 18px rgba(36,200,255,.25), 0 0 28px rgba(36,200,255,.28) inset; }
     .audio-toggle:active{ transform: translateY(0); }
+      /* Single "snake" light moving through the grid */
+    .snake{ position:absolute; width:14px; height:14px; border-radius:50%; left:0; top:0;
+      background: radial-gradient(circle, #fff 0 25%, #9be7ff 45%, rgba(36,200,255,.0) 70%);
+      box-shadow: 0 0 14px rgba(36,200,255,.9), 0 0 24px rgba(36,200,255,.6), 0 0 32px rgba(255,59,78,.35);
+      offset-path: path('M 40 560 L 960 560 L 960 520 L 40 520 L 40 480 L 960 480 L 960 440 L 40 440 L 40 400 L 960 400 L 960 360 L 40 360 L 40 320 L 960 320 L 960 280 L 40 280');
+      offset-rotate: 0deg; transform: translate(-7px,-7px);
+      animation: snakeMove 18s linear infinite;
+    }
+    @keyframes snakeMove{ to{ offset-distance: 100%; } }
+
+    @media (prefers-reduced-motion: reduce){ .snake{ animation: none } }
   </style>
 </head>
 <body>
   <div class="grid" aria-hidden="true">
     <div class="grid__plane">
-      <div class="grid__scan"></div>
+      <!-- Snake light travels along a serpentine path across grid rows -->
+      <svg class="grid__snake" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" aria-hidden="true" style="position:absolute; inset:0;">
+        <defs>
+          <linearGradient id="snakeGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#24c8ff"/>
+            <stop offset="100%" stop-color="#ff3b4e"/>
+          </linearGradient>
+        </defs>
+        <!-- (optional) very faint guide path -->
+        <path d="M 40 560 L 960 560 L 960 520 L 40 520 L 40 480 L 960 480 L 960 440 L 40 440 L 40 400 L 960 400 L 960 360 L 40 360 L 40 320 L 960 320 L 960 280 L 40 280" stroke="url(#snakeGlow)" stroke-width="2" opacity="0.06" fill="none"/>
+      </svg>
+      <div class="snake" aria-hidden="true"></div>
+    </div>
     </div>
   </div>
 
@@ -123,7 +137,7 @@
 
   <main class="wrap">
     <section class="card">
-      <h1>Welcome back, Aryan</h1>
+      <h1>Welcome back Aryan</h1>
       <p class="subtitle">SYSTEM ONLINE · ACCESS YOUR HUB</p>
       <nav class="cta">
         <a class="btn" href="https://calendar.google.com/" target="_blank">Google Calendar</a>
