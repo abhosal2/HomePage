@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Aryan | Home</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg:#05060f;
@@ -23,9 +23,27 @@
       overflow:hidden;
     }
 
-    /* Tron grid background - blue and red mix */
-    /* Old pseudo grid disabled; replaced by full-screen grid container */
-    body::before{ display:none; }
+    /* Full-screen Tron grid (blue + red) */
+    .grid{ position:fixed; inset:0; z-index:-1; perspective: 900px; background: #05060f; }
+    .grid__plane{
+      position:absolute; left:-8vw; right:-8vw; bottom:-30vh; height:110vh;
+      transform: rotateX(58deg) translateZ(-150px);
+      transform-origin: top center;
+      background-image:
+        linear-gradient(var(--grid-blue) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-red) 1px, transparent 1px);
+      background-size: 50px 50px; background-position: center;
+      filter: drop-shadow(0 0 8px var(--grid-blue)) drop-shadow(0 0 6px var(--grid-red));
+    }
+
+    .grid__scan{ position:absolute; inset:-10% -20%; pointer-events:none; mix-blend-mode: screen; opacity:.45;
+      background:
+        radial-gradient(420px 160px at 0% 55%, rgba(36,200,255,.22), transparent 65%),
+        radial-gradient(420px 160px at 0% 45%, rgba(255,59,78,.18), transparent 70%);
+      transform: translateX(-30%);
+      animation: scanMove 12s linear infinite;
+    }
+    @keyframes scanMove{ to{ transform: translateX(130%) } }
 
     .wrap{ position:relative; z-index:10; height:100vh; display:grid; place-items:center; text-align:center; padding:40px; }
 
@@ -40,17 +58,17 @@
     }
 
     h1{
-      font-family: 'Orbitron', ui-sans-serif;
-      font-weight:900; letter-spacing:.06em; line-height:1.02;
+      font-family: 'Rajdhani', 'Orbitron', ui-sans-serif;
+      font-weight:900; letter-spacing:.08em; line-height:1.02;
       font-size: clamp(44px, 9vw, 100px);
       margin-bottom:16px;
       text-transform: uppercase;
-      color: var(--text);
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--grid-blue);
       text-shadow:
-        0 0 8px rgba(36,200,255,.7),
-        0 0 16px rgba(36,200,255,.4),
-        0 0 24px rgba(255,59,78,.4),
-        0 0 60px rgba(255,59,78,.2);
+        0 0 12px rgba(36,200,255,.75),
+        0 0 20px rgba(255,59,78,.35),
+        0 0 28px rgba(36,200,255,.4);
     }
 
     .subtitle{
@@ -78,7 +96,6 @@
 
     .footer{ margin-top: 20px; opacity:.7; font-size: 12px }
 
-    /* Audio Toggle */
     .audio-toggle{
       position: fixed; right: 16px; bottom: 16px; z-index: 200;
       width: 44px; height: 44px; border-radius: 12px; border:1px solid rgba(36,200,255,.45);
@@ -89,38 +106,15 @@
     }
     .audio-toggle:hover{ transform: translateY(-1px); border-color: rgba(36,200,255,.8); box-shadow: 0 0 18px rgba(36,200,255,.25), 0 0 28px rgba(36,200,255,.28) inset; }
     .audio-toggle:active{ transform: translateY(0); }
-      /* Full-screen Tron grid (blue + red) with better top coverage */
-    .grid{ position:fixed; inset:0; z-index:-1; perspective: 900px; background: #05060f; }
-    .grid__plane{
-      position:absolute; left:-8vw; right:-8vw; bottom:-30vh; height:110vh;
-      transform: rotateX(58deg) translateZ(-150px);
-      transform-origin: top center;
-      background-image:
-        linear-gradient(var(--grid-blue) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid-red) 1px, transparent 1px);
-      background-size: 50px 50px; background-position: center;
-      filter: drop-shadow(0 0 8px var(--grid-blue)) drop-shadow(0 0 6px var(--grid-red));
-    }
-    /* Subtle light sweeping across the grid */
-    .grid__scan{ position:absolute; inset:-10% -20%; pointer-events:none; mix-blend-mode: screen; opacity:.45;
-      background:
-        radial-gradient(420px 160px at 0% 55%, rgba(36,200,255,.22), transparent 65%),
-        radial-gradient(420px 160px at 0% 45%, rgba(255,59,78,.18), transparent 70%);
-      transform: translateX(-30%);
-      animation: scanMove 12s linear infinite;
-    }
-    @keyframes scanMove{ to{ transform: translateX(130%) } }
-
-    @media (prefers-reduced-motion: reduce){ .grid__scan{ animation:none } }
   </style>
 </head>
 <body>
-  <!-- Full-screen background grid -->
   <div class="grid" aria-hidden="true">
     <div class="grid__plane">
       <div class="grid__scan"></div>
     </div>
   </div>
+
   <audio id="bgm" preload="auto" loop>
     <source src="end_of_line.mp3" type="audio/mpeg">
   </audio>
