@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Aryan | Home</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg:#05060f;
-      --grid:#0b1630;
-      --neon-blue:#24c8ff;
+      --grid-blue:#24c8ff;
+      --grid-red:#ff3b4e;
       --text:#e9f3ff;
       --maxw: 1000px;
     }
@@ -23,18 +23,18 @@
       overflow:hidden;
     }
 
-    /* Tron grid background (blue only) */
+    /* Tron grid background - blue and red mix */
     body::before{
       content:"";
       position:fixed; inset:0;
       background-image:
-        linear-gradient(var(--grid) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+        linear-gradient(var(--grid-blue) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-red) 1px, transparent 1px);
       background-size: 50px 50px;
       background-position: center;
       transform: rotateX(60deg) translateY(200px);
       transform-origin: center;
-      filter: drop-shadow(0 0 6px var(--neon-blue));
+      filter: drop-shadow(0 0 8px var(--grid-blue)) drop-shadow(0 0 6px var(--grid-red));
       z-index:-1;
     }
 
@@ -46,20 +46,22 @@
       background: rgba(5,8,18,.45);
       border: 1px solid rgba(36,200,255,.35);
       border-radius: 22px;
-      box-shadow: 0 0 40px rgba(36,200,255,.18), 0 0 80px rgba(36,200,255,.12) inset;
+      box-shadow: 0 0 40px rgba(36,200,255,.18), 0 0 80px rgba(255,59,78,.12) inset;
       padding: 40px;
     }
 
     h1{
       font-family: 'Orbitron', ui-sans-serif;
-      font-weight:900; letter-spacing:.04em; line-height:1.02;
-      font-size: clamp(36px, 8vw, 86px);
+      font-weight:900; letter-spacing:.06em; line-height:1.02;
+      font-size: clamp(44px, 9vw, 100px);
       margin-bottom:16px;
       text-transform: uppercase;
       color: var(--text);
       text-shadow:
-        0 0 8px rgba(36,200,255,.6),
-        0 0 18px rgba(36,200,255,.4);
+        0 0 8px rgba(36,200,255,.7),
+        0 0 16px rgba(36,200,255,.4),
+        0 0 24px rgba(255,59,78,.4),
+        0 0 60px rgba(255,59,78,.2);
     }
 
     .subtitle{
