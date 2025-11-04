@@ -23,10 +23,13 @@
       overflow:hidden;
     }
 
-    /* Full-screen Tron grid (blue + red) */
-    .grid{ position:fixed; inset:0; z-index:-1; perspective: 900px; background: #05060f; }
+    /* Full-screen Tron grid with red & blue lines */
+    .grid{
+      position:fixed; inset:0; z-index:-1; perspective: 900px; background: #05060f;
+      display:flex; align-items:center; justify-content:center;
+    }
     .grid__plane{
-      position:absolute; left:-12vw; right:-12vw; bottom:-50vh; height:140vh;
+      position:absolute; left:-10vw; right:-10vw; bottom:-40vh; height:130vh;
       transform: rotateX(55deg) translateZ(-120px);
       transform-origin: top center;
       background-image:
@@ -34,7 +37,20 @@
         linear-gradient(90deg, var(--grid-red) 1px, transparent 1px);
       background-size: 50px 50px; background-position: center;
       filter: drop-shadow(0 0 8px var(--grid-blue)) drop-shadow(0 0 6px var(--grid-red));
-    } }
+    }
+
+    /* Light snake moving through the grid */
+    .snake{
+      position:absolute; width:16px; height:16px; border-radius:50%; left:0; top:0;
+      background: radial-gradient(circle, #fff 0 25%, #9be7ff 45%, rgba(36,200,255,.0) 70%);
+      box-shadow: 0 0 14px rgba(36,200,255,.9), 0 0 24px rgba(36,200,255,.6), 0 0 32px rgba(255,59,78,.35);
+      offset-path: path('M 40 560 L 960 560 L 960 520 L 40 520 L 40 480 L 960 480 L 960 440 L 40 440 L 40 400 L 960 400 L 960 360 L 40 360 L 40 320 L 960 320 L 960 280 L 40 280 L 40 240 L 960 240 L 960 200 L 40 200');
+      offset-rotate: 0deg; transform: translate(-8px,-8px);
+      animation: snakeMove 25s linear infinite;
+    }
+    @keyframes snakeMove { to { offset-distance: 100%; } }
+
+    @media (prefers-reduced-motion: reduce){ .snake{ animation:none } }
 
     .wrap{ position:relative; z-index:10; height:100vh; display:grid; place-items:center; text-align:center; padding:40px; }
 
@@ -55,11 +71,8 @@
       margin-bottom:16px;
       text-transform: uppercase;
       color: transparent;
-      -webkit-text-stroke: 1.5px var(--grid-blue);
-      text-shadow:
-        0 0 12px rgba(36,200,255,.75),
-        0 0 20px rgba(255,59,78,.35),
-        0 0 28px rgba(36,200,255,.4);
+      -webkit-text-stroke: 1.6px var(--grid-blue);
+      text-shadow: 0 0 16px rgba(36,200,255,.75), 0 0 24px rgba(255,59,78,.4);
     }
 
     .subtitle{
@@ -97,35 +110,12 @@
     }
     .audio-toggle:hover{ transform: translateY(-1px); border-color: rgba(36,200,255,.8); box-shadow: 0 0 18px rgba(36,200,255,.25), 0 0 28px rgba(36,200,255,.28) inset; }
     .audio-toggle:active{ transform: translateY(0); }
-      /* Single "snake" light moving through the grid */
-    .snake{ position:absolute; width:14px; height:14px; border-radius:50%; left:0; top:0;
-      background: radial-gradient(circle, #fff 0 25%, #9be7ff 45%, rgba(36,200,255,.0) 70%);
-      box-shadow: 0 0 14px rgba(36,200,255,.9), 0 0 24px rgba(36,200,255,.6), 0 0 32px rgba(255,59,78,.35);
-      offset-path: path('M 40 560 L 960 560 L 960 520 L 40 520 L 40 480 L 960 480 L 960 440 L 40 440 L 40 400 L 960 400 L 960 360 L 40 360 L 40 320 L 960 320 L 960 280 L 40 280');
-      offset-rotate: 0deg; transform: translate(-7px,-7px);
-      animation: snakeMove 18s linear infinite;
-    }
-    @keyframes snakeMove{ to{ offset-distance: 100%; } }
-
-    @media (prefers-reduced-motion: reduce){ .snake{ animation: none } }
   </style>
 </head>
 <body>
   <div class="grid" aria-hidden="true">
     <div class="grid__plane">
-      <!-- Snake light travels along a serpentine path across grid rows -->
-      <svg class="grid__snake" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" aria-hidden="true" style="position:absolute; inset:0;">
-        <defs>
-          <linearGradient id="snakeGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#24c8ff"/>
-            <stop offset="100%" stop-color="#ff3b4e"/>
-          </linearGradient>
-        </defs>
-        <!-- (optional) very faint guide path -->
-        <path d="M 40 560 L 960 560 L 960 520 L 40 520 L 40 480 L 960 480 L 960 440 L 40 440 L 40 400 L 960 400 L 960 360 L 40 360 L 40 320 L 960 320 L 960 280 L 40 280" stroke="url(#snakeGlow)" stroke-width="2" opacity="0.06" fill="none"/>
-      </svg>
       <div class="snake" aria-hidden="true"></div>
-    </div>
     </div>
   </div>
 
