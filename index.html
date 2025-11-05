@@ -92,26 +92,13 @@
 
     /* ===== Snake animation across FULL grid ===== */
     .snake{ position:fixed; inset:0; pointer-events:none; z-index:0 }
-    .snake__seg{
-      position:absolute; width:160px; height:14px; border-radius:999px; left:0; top:0;
-      background: radial-gradient(65% 120% at 35% 50%, rgba(255,255,255,.95) 0 25%, #b6ffd0 35%, rgba(25,255,94,.25) 65%, rgba(25,255,94,0) 80%);
-      box-shadow: 0 0 18px rgba(25,255,94,.85), 0 0 28px rgba(25,255,94,.5);
-      offset-path: path('M 2 98 H 98 V 92 H 2 V 86 H 98 V 80 H 2 V 74 H 98 V 68 H 2 V 62 H 98 V 56 H 2 V 50 H 98 V 44 H 2 V 38 H 98 V 32 H 2 V 26 H 98 V 20 H 2 V 14 H 98 V 8 H 2');
-      offset-rotate: auto; transform: translate(-80px,-7px);
-      animation: snakeRun 28s linear infinite;
-    }
-    .snake__seg.s1{ filter: blur(.6px); opacity:.8; animation-delay:-0.5s }
-    .snake__seg.s2{ filter: blur(1.2px); opacity:.6; animation-delay:-1.0s }
-    .snake__seg.s3{ filter: blur(1.8px); opacity:.4; animation-delay:-1.5s }
-    .snake__seg.s4{ filter: blur(2.4px); opacity:.25; animation-delay:-2.0s }
-
-    @keyframes snakeRun{ to{ offset-distance: 100%; } }
+    /* (Snake animation removed) */ }
 
     /* ===== Audio Toggle ===== */
     .audio-toggle{
-      position: fixed; right: 16px; bottom: 16px; z-index: 2;
+      position: fixed; right: 16px; bottom: 16px; z-index: 9999; /* ensure above everything */
       width: 44px; height: 44px; border-radius: 12px; border:1px solid rgba(25,255,94,.45);
-      background: rgba(0,0,0,.7);
+      background: rgba(0,0,0,.8);
       color: var(--text); font-size: 18px; cursor: pointer;
       box-shadow: 0 0 12px rgba(25,255,94,.22) inset, 0 0 22px rgba(25,255,94,.16);
       transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
@@ -126,13 +113,8 @@
   <div class="crt-grid" aria-hidden="true"></div>
   <div class="scanlines" aria-hidden="true"></div>
 
-  <!-- Single snake with short tail -->
-  <div class="snake" aria-hidden="true">
-    <div class="snake__seg"></div>
-    <div class="snake__seg s1"></div>
-    <div class="snake__seg s2"></div>
-    <div class="snake__seg s3"></div>
-    <div class="snake__seg s4"></div>
+  <!-- (Snake effect removed per request) -->
+    </div>
   </div>
 
   <audio id="bgm" preload="auto" loop>
