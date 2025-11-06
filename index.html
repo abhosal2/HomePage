@@ -8,100 +8,99 @@
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#05060f;            /* deep black */
-      --crt-green:#19ff5e;     /* bright CRT green */
-      --crt-dim:#0ad14a;       /* dimmer line */
-      --text:#c9ffd8;          /* light green text */
-      --cell:60px;             /* grid cell size */
-      --maxw: 1000px;
+      --bg:#05060f;
+      --crt-green:#19ff5e;
+      --crt-dim:#0ad14a;
+      --text:#c9ffd8;
+      --cell:60px;
+      --maxw:1000px;
     }
 
-    *{box-sizing:border-box; margin:0; padding:0}
+    *{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%}
     body{
-      font-family: 'VT323', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family:'VT323',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
       color:var(--text);
-      background: var(--bg);
-      overflow:hidden; /* lock to viewport */
+      background:var(--bg);
+      overflow:hidden;
     }
 
-    /* ===== Full-viewport CRT grid (top-to-bottom, no perspective) ===== */
+    /* ===== Full-viewport CRT grid ===== */
     .crt-grid{
-      position:fixed; inset:0; z-index:-1; background: #000; /* solid base */
+      position:fixed;inset:0;z-index:-1;background:#000;
       background-image:
-        repeating-linear-gradient(0deg,  transparent 0 calc(var(--cell) - 1px), rgba(25,255,94,0.45) calc(var(--cell) - 1px) var(--cell)),
-        repeating-linear-gradient(90deg, transparent 0 calc(var(--cell) - 1px), rgba(25,255,94,0.45) calc(var(--cell) - 1px) var(--cell));
-      /* subtle bottom green bloom like the reference */
-      box-shadow: inset 0 -160px 120px -40px rgba(25,255,94,0.25);
+        repeating-linear-gradient(0deg,transparent 0 calc(var(--cell)-1px),rgba(25,255,94,0.45) calc(var(--cell)-1px) var(--cell)),
+        repeating-linear-gradient(90deg,transparent 0 calc(var(--cell)-1px),rgba(25,255,94,0.45) calc(var(--cell)-1px) var(--cell));
+      box-shadow:inset 0 -160px 120px -40px rgba(25,255,94,0.25);
     }
 
-    /* optional faint scanlines to mimic CRT */
-    .scanlines{ position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.08;
-      background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.7) 0 1px, transparent 1px 3px);
-      mix-blend-mode: screen;
+    /* faint scanlines */
+    .scanlines{
+      position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.08;
+      background-image:repeating-linear-gradient(0deg,rgba(255,255,255,0.7) 0 1px,transparent 1px 3px);
+      mix-blend-mode:screen;
     }
 
-    .wrap{ position:relative; z-index:10; height:100vh; display:grid; place-items:center; text-align:center; padding:40px; }
+    .wrap{position:relative;z-index:10;height:100vh;display:grid;place-items:center;text-align:center;padding:40px;}
 
     .card{
-      width:min(92vw, var(--maxw));
-      background: rgba(0,0,0,.55);
-      border: 1px solid rgba(25,255,94,.35);
-      border-radius: 20px;
-      box-shadow: 0 0 24px rgba(25,255,94,.2) inset, 0 0 40px rgba(0,0,0,.6);
-      padding: 40px;
+      width:min(92vw,var(--maxw));
+      background:rgba(0,0,0,.55);
+      border:1px solid rgba(25,255,94,.35);
+      border-radius:20px;
+      box-shadow:0 0 24px rgba(25,255,94,.2) inset,0 0 40px rgba(0,0,0,.6);
+      padding:40px;
     }
 
-    /* CRT headline: green, chunky, slightly hollow with glow */
     h1{
-      font-size: clamp(40px, 12vw, 120px);
-      line-height: 0.9;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: var(--crt-green);
+      font-size:clamp(40px,12vw,120px);
+      line-height:.9;
+      letter-spacing:4px;
+      text-transform:uppercase;
+      color:var(--crt-green);
       text-shadow:
         0 0 6px rgba(25,255,94,.9),
         0 0 18px rgba(25,255,94,.5),
         0 0 32px rgba(25,255,94,.35);
-      -webkit-text-stroke: 2px rgba(0,0,0,.6); /* old-screen bevel */
-      margin-bottom: 18px;
+      -webkit-text-stroke:2px rgba(0,0,0,.6);
+      margin-bottom:18px;
     }
 
     .subtitle{
-      font-size: clamp(16px, 3.2vw, 26px);
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: #a9ffc7;
-      opacity:.9; margin-bottom: 28px;
+      font-size:clamp(16px,3.2vw,26px);
+      letter-spacing:4px;
+      text-transform:uppercase;
+      color:#a9ffc7;
+      opacity:.9;
+      margin-bottom:28px;
     }
 
-    .cta{ display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:center; }
+    .cta{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:center;}
 
     .btn{
-      height: 56px; padding: 0 26px; border-radius: 12px; text-decoration:none; display:grid; place-items:center;
-      color: var(--crt-green); font-size: 22px; letter-spacing: 2px;
-      border: 1px solid rgba(25,255,94,.4);
-      background: rgba(0,0,0,.65);
-      box-shadow: 0 0 14px rgba(25,255,94,.25) inset, 0 0 18px rgba(25,255,94,.18);
-      transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
+      height:56px;padding:0 26px;border-radius:12px;text-decoration:none;display:grid;place-items:center;
+      color:var(--crt-green);font-size:22px;letter-spacing:2px;
+      border:1px solid rgba(25,255,94,.4);
+      background:rgba(0,0,0,.65);
+      box-shadow:0 0 14px rgba(25,255,94,.25) inset,0 0 18px rgba(25,255,94,.18);
+      transition:transform .12s ease,box-shadow .2s ease,border-color .2s ease;
     }
-    .btn:hover{ transform: translateY(-1px); border-color: rgba(25,255,94,.8); box-shadow: 0 0 18px rgba(25,255,94,.35), 0 0 24px rgba(25,255,94,.25) inset; }
-    .btn:active{ transform: translateY(0); }
+    .btn:hover{transform:translateY(-1px);border-color:rgba(25,255,94,.8);box-shadow:0 0 18px rgba(25,255,94,.35),0 0 24px rgba(25,255,94,.25) inset;}
+    .btn:active{transform:translateY(0);}
 
     /* Audio Toggle */
     .audio-toggle{
-      position: fixed; right: 16px; bottom: 16px; z-index: 9999;
-      width: 44px; height: 44px; border-radius: 12px; border:1px solid rgba(25,255,94,.45);
-      background: rgba(0,0,0,.8);
-      color: var(--text); font-size: 18px; cursor: pointer;
-      box-shadow: 0 0 12px rgba(25,255,94,.22) inset, 0 0 22px rgba(25,255,94,.16);
-      transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
+      position:fixed;right:16px;bottom:16px;z-index:9999;
+      width:44px;height:44px;border-radius:12px;border:1px solid rgba(25,255,94,.45);
+      background:rgba(0,0,0,.8);
+      color:var(--text);font-size:18px;cursor:pointer;
+      box-shadow:0 0 12px rgba(25,255,94,.22) inset,0 0 22px rgba(25,255,94,.16);
+      transition:transform .12s ease,box-shadow .2s ease,border-color .2s ease;
     }
-    .audio-toggle:hover{ transform: translateY(-1px); border-color: rgba(25,255,94,.8); box-shadow: 0 0 18px rgba(25,255,94,.25), 0 0 28px rgba(25,255,94,.28) inset; }
+    .audio-toggle:hover{transform:translateY(-1px);border-color:rgba(25,255,94,.8);box-shadow:0 0 18px rgba(25,255,94,.25),0 0 28px rgba(25,255,94,.28) inset;}
   </style>
 </head>
 <body>
-  <!-- CRT grid background and scanlines -->
   <div class="crt-grid" aria-hidden="true"></div>
   <div class="scanlines" aria-hidden="true"></div>
 
@@ -118,7 +117,6 @@
       <nav class="cta">
         <a class="btn" href="https://calendar.google.com/" target="_blank">Google Calendar</a>
         <a class="btn" href="https://outlook.office.com/" target="_blank">Outlook</a>
-        <a class="btn" href="https://www.google.com/webhp?igu=1" target="_blank">New Tab</a>
         <a class="btn" href="https://www.google.com/" target="_blank">Google</a>
         <a class="btn" href="#home" onclick="location.reload();return false;">Home</a>
       </nav>
@@ -128,15 +126,15 @@
   <script>
     // Audio toggle
     (function(){
-      const btn = document.getElementById('audioToggle');
-      const audio = document.getElementById('bgm');
-      if(!btn || !audio) return;
-      audio.volume = 0.14;
-      function updateIcon(){ btn.textContent = audio.paused ? '🔇' : '🔊'; }
-      btn.addEventListener('click', ()=>{ 
-        if(audio.paused){ audio.muted = false; audio.play().catch(()=>{});} 
-        else { audio.pause(); } 
-        updateIcon(); 
+      const btn=document.getElementById('audioToggle');
+      const audio=document.getElementById('bgm');
+      if(!btn||!audio)return;
+      audio.volume=0.14;
+      function updateIcon(){btn.textContent=audio.paused?'🔇':'🔊';}
+      btn.addEventListener('click',()=>{
+        if(audio.paused){audio.muted=false;audio.play().catch(()=>{});}
+        else{audio.pause();}
+        updateIcon();
       });
       updateIcon();
     })();
