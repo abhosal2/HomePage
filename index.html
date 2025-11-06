@@ -10,7 +10,6 @@
     :root{
       --bg:#05060f;
       --crt-green:#19ff5e;
-      --crt-dim:#0ad14a;
       --text:#c9ffd8;
       --cell:60px;
       --maxw:1000px;
@@ -21,27 +20,26 @@
     body{
       font-family:'VT323',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
       color:var(--text);
-      background:var(--bg);
+      background:#000; /* solid base so grid pops */
       overflow:hidden;
     }
 
     /* ===== Full-viewport CRT grid ===== */
     .crt-grid{
-      position:fixed;inset:0;z-index:-1;background:#000;
+      position:fixed;inset:0;z-index:-1;
       background-image:
-        repeating-linear-gradient(0deg,transparent 0 calc(var(--cell)-1px),rgba(25,255,94,0.45) calc(var(--cell)-1px) var(--cell)),
-        repeating-linear-gradient(90deg,transparent 0 calc(var(--cell)-1px),rgba(25,255,94,0.45) calc(var(--cell)-1px) var(--cell));
+        repeating-linear-gradient(0deg,transparent 0 calc(var(--cell) - 1px), rgba(25,255,94,0.45) calc(var(--cell) - 1px) var(--cell)),
+        repeating-linear-gradient(90deg,transparent 0 calc(var(--cell) - 1px), rgba(25,255,94,0.45) calc(var(--cell) - 1px) var(--cell));
       box-shadow:inset 0 -160px 120px -40px rgba(25,255,94,0.25);
     }
 
-    /* faint scanlines */
-    .scanlines{
-      position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.08;
+    /* optional faint scanlines */
+    .scanlines{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.08;
       background-image:repeating-linear-gradient(0deg,rgba(255,255,255,0.7) 0 1px,transparent 1px 3px);
       mix-blend-mode:screen;
     }
 
-    .wrap{position:relative;z-index:10;height:100vh;display:grid;place-items:center;text-align:center;padding:40px;}
+    .wrap{position:relative;z-index:1;height:100vh;display:grid;place-items:center;text-align:center;padding:40px;}
 
     .card{
       width:min(92vw,var(--maxw));
@@ -54,26 +52,14 @@
 
     h1{
       font-size:clamp(40px,12vw,120px);
-      line-height:.9;
-      letter-spacing:4px;
-      text-transform:uppercase;
+      line-height:.9;letter-spacing:4px;text-transform:uppercase;
       color:var(--crt-green);
-      text-shadow:
-        0 0 6px rgba(25,255,94,.9),
-        0 0 18px rgba(25,255,94,.5),
-        0 0 32px rgba(25,255,94,.35);
+      text-shadow:0 0 6px rgba(25,255,94,.9),0 0 18px rgba(25,255,94,.5),0 0 32px rgba(25,255,94,.35);
       -webkit-text-stroke:2px rgba(0,0,0,.6);
       margin-bottom:18px;
     }
 
-    .subtitle{
-      font-size:clamp(16px,3.2vw,26px);
-      letter-spacing:4px;
-      text-transform:uppercase;
-      color:#a9ffc7;
-      opacity:.9;
-      margin-bottom:28px;
-    }
+    .subtitle{font-size:clamp(16px,3.2vw,26px);letter-spacing:4px;text-transform:uppercase;color:#a9ffc7;opacity:.9;margin-bottom:28px;}
 
     .cta{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:center;}
 
@@ -86,7 +72,6 @@
       transition:transform .12s ease,box-shadow .2s ease,border-color .2s ease;
     }
     .btn:hover{transform:translateY(-1px);border-color:rgba(25,255,94,.8);box-shadow:0 0 18px rgba(25,255,94,.35),0 0 24px rgba(25,255,94,.25) inset;}
-    .btn:active{transform:translateY(0);}
 
     /* Audio Toggle */
     .audio-toggle{
@@ -101,6 +86,7 @@
   </style>
 </head>
 <body>
+  <!-- Background grid and scanlines -->
   <div class="crt-grid" aria-hidden="true"></div>
   <div class="scanlines" aria-hidden="true"></div>
 
@@ -132,8 +118,7 @@
       audio.volume=0.14;
       function updateIcon(){btn.textContent=audio.paused?'🔇':'🔊';}
       btn.addEventListener('click',()=>{
-        if(audio.paused){audio.muted=false;audio.play().catch(()=>{});}
-        else{audio.pause();}
+        if(audio.paused){audio.muted=false;audio.play().catch(()=>{});} else {audio.pause();}
         updateIcon();
       });
       updateIcon();
