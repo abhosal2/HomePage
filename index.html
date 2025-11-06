@@ -88,15 +88,9 @@
     .btn:hover{ transform: translateY(-1px); border-color: rgba(25,255,94,.8); box-shadow: 0 0 18px rgba(25,255,94,.35), 0 0 24px rgba(25,255,94,.25) inset; }
     .btn:active{ transform: translateY(0); }
 
-    .footer{ margin-top: 20px; opacity:.75; font-size: 18px }
-
-    /* ===== Snake animation across FULL grid ===== */
-    .snake{ position:fixed; inset:0; pointer-events:none; z-index:0 }
-    /* (Snake animation removed) */ }
-
-    /* ===== Audio Toggle ===== */
+    /* Audio Toggle */
     .audio-toggle{
-      position: fixed; right: 16px; bottom: 16px; z-index: 9999; /* ensure above everything */
+      position: fixed; right: 16px; bottom: 16px; z-index: 9999;
       width: 44px; height: 44px; border-radius: 12px; border:1px solid rgba(25,255,94,.45);
       background: rgba(0,0,0,.8);
       color: var(--text); font-size: 18px; cursor: pointer;
@@ -104,18 +98,12 @@
       transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
     }
     .audio-toggle:hover{ transform: translateY(-1px); border-color: rgba(25,255,94,.8); box-shadow: 0 0 18px rgba(25,255,94,.25), 0 0 28px rgba(25,255,94,.28) inset; }
-
-    @media (prefers-reduced-motion: reduce){ .snake__seg{ animation:none } }
   </style>
 </head>
 <body>
   <!-- CRT grid background and scanlines -->
   <div class="crt-grid" aria-hidden="true"></div>
   <div class="scanlines" aria-hidden="true"></div>
-
-  <!-- (Snake effect removed per request) -->
-    </div>
-  </div>
 
   <audio id="bgm" preload="auto" loop>
     <source src="end_of_line.mp3" type="audio/mpeg">
@@ -130,6 +118,8 @@
       <nav class="cta">
         <a class="btn" href="https://calendar.google.com/" target="_blank">Google Calendar</a>
         <a class="btn" href="https://outlook.office.com/" target="_blank">Outlook</a>
+        <a class="btn" href="https://www.google.com/webhp?igu=1" target="_blank">New Tab</a>
+        <a class="btn" href="https://www.google.com/" target="_blank">Google</a>
         <a class="btn" href="#home" onclick="location.reload();return false;">Home</a>
       </nav>
     </section>
@@ -143,7 +133,11 @@
       if(!btn || !audio) return;
       audio.volume = 0.14;
       function updateIcon(){ btn.textContent = audio.paused ? '🔇' : '🔊'; }
-      btn.addEventListener('click', ()=>{ if(audio.paused){ audio.muted = false; audio.play().catch(()=>{});} else { audio.pause(); } updateIcon(); });
+      btn.addEventListener('click', ()=>{ 
+        if(audio.paused){ audio.muted = false; audio.play().catch(()=>{});} 
+        else { audio.pause(); } 
+        updateIcon(); 
+      });
       updateIcon();
     })();
   </script>
