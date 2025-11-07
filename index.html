@@ -11,7 +11,7 @@
       --bg:#05060f;
       --crt-green:#19ff5e;
       --text:#c9ffd8;
-      --cell:60px;
+      --cell:60px;           /* desktop default */
       --maxw:1000px;
     }
 
@@ -20,10 +20,13 @@
     body{
       font-family:'VT323',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
       color:var(--text);
-      background:#000;
+      background:#000; /* solid base so grid pops */
       overflow:hidden;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
     }
 
+    /* ===== Full-viewport CRT grid ===== */
     .crt-grid{
       position:fixed;inset:0;z-index:-1;
       background-image:
@@ -32,12 +35,21 @@
       box-shadow:inset 0 -160px 120px -40px rgba(25,255,94,0.25);
     }
 
-    .scanlines{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.08;
+    /* optional faint scanlines */
+    .scanlines{
+      position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.08;
       background-image:repeating-linear-gradient(0deg,rgba(255,255,255,0.7) 0 1px,transparent 1px 3px);
       mix-blend-mode:screen;
     }
 
-    .wrap{position:relative;z-index:1;height:100vh;display:grid;place-items:center;text-align:center;padding:40px;}
+    .wrap{
+      position:relative;z-index:1;height:100vh;display:grid;place-items:center;text-align:center;padding:40px;
+    }
+
+    /* Ensure modern mobile browsers use the “small viewport” height accounting for UI chrome */
+    @supports (height: 100svh){
+      .wrap{ height:100svh; }
+    }
 
     .card{
       width:min(92vw,var(--maxw));
@@ -57,7 +69,9 @@
       margin-bottom:18px;
     }
 
-    .subtitle{font-size:clamp(16px,3.2vw,26px);letter-spacing:4px;text-transform:uppercase;color:#a9ffc7;opacity:.9;margin-bottom:28px;}
+    .subtitle{
+      font-size:clamp(16px,3.2vw,26px);letter-spacing:4px;text-transform:uppercase;color:#a9ffc7;opacity:.9;margin-bottom:28px;
+    }
 
     .cta{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:center;}
 
@@ -68,9 +82,11 @@
       background:rgba(0,0,0,.65);
       box-shadow:0 0 14px rgba(25,255,94,.25) inset,0 0 18px rgba(25,255,94,.18);
       transition:transform .12s ease,box-shadow .2s ease,border-color .2s ease;
+      touch-action:manipulation;
     }
     .btn:hover{transform:translateY(-1px);border-color:rgba(25,255,94,.8);box-shadow:0 0 18px rgba(25,255,94,.35),0 0 24px rgba(25,255,94,.25) inset;}
 
+    /* Audio Toggle */
     .audio-toggle{
       position:fixed;right:16px;bottom:16px;z-index:9999;
       width:44px;height:44px;border-radius:12px;border:1px solid rgba(25,255,94,.45);
@@ -80,6 +96,108 @@
       transition:transform .12s ease,box-shadow .2s ease,border-color .2s ease;
     }
     .audio-toggle:hover{transform:translateY(-1px);border-color:rgba(25,255,94,.8);box-shadow:0 0 18px rgba(25,255,94,.25),0 0 28px rgba(25,255,94,.28) inset;}
+
+    /* ===== Mobile-only top bar (hidden on larger screens) ===== */
+    .mobile-topbar, .mobile-menu{ display:none; }
+
+    /* ===== Mobile-only polish (does NOT affect laptops/desktops) ===== */
+    @media (max-width: 640px){
+      :root{
+        --cell:34px;          /* tighter grid for phones */
+        --maxw:560px;
+      }
+
+      body{ overflow:auto; }  /* avoid accidental clipping on short viewports */
+
+      .mobile-topbar{
+        position:fixed;top:0;left:0;right:0;z-index:1000;
+        height:56px;
+        display:flex;align-items:center;justify-content:space-between;
+        padding:0 14px;
+        background:rgba(0,0,0,.7);
+        border-bottom:1px solid rgba(25,255,94,.35);
+        box-shadow:0 6px 16px rgba(0,0,0,.5);
+        backdrop-filter:blur(6px);
+      }
+      .brand{
+        color:var(--crt-green);
+        font-size:24px;letter-spacing:3px;text-transform:uppercase;
+        text-shadow:0 0 6px rgba(25,255,94,.7),0 0 16px rgba(25,255,94,.3);
+      }
+      .hamburger{
+        width:44px;height:44px;border-radius:10px;border:1px solid rgba(25,255,94,.45);
+        background:rgba(0,0,0,.85);color:var(--text);font-size:22px;cursor:pointer;
+        display:grid;place-items:center;
+        box-shadow:0 0 12px rgba(25,255,94,.22) inset,0 0 22px rgba(25,255,94,.16);
+      }
+
+      .mobile-menu{
+        position:fixed;top:56px;left:0;right:0;z-index:999;
+        display:block;
+        transform:translateY(-110%);
+        transition:transform .22s ease;
+        background:rgba(0,0,0,.9);
+        border-bottom:1px solid rgba(25,255,94,.35);
+        backdrop-filter:blur(6px);
+      }
+      .mobile-menu.open{ transform:translateY(0); }
+
+      .mobile-menu .menu-grid{
+        display:grid;grid-template-columns:1fr 1fr;gap:12px;
+        padding:14px;
+      }
+      .mobile-link{
+        height:48px;display:grid;place-items:center;text-decoration:none;border-radius:12px;
+        border:1px solid rgba(25,255,94,.35);
+        color:var(--crt-green);font-size:18px;letter-spacing:2px;background:rgba(0,0,0,.65);
+        box-shadow:0 0 10px rgba(25,255,94,.18) inset,0 0 18px rgba(0,0,0,.45);
+      }
+
+      .wrap{
+        padding:20px;
+        /* push content below top bar */
+        padding-top:84px;
+      }
+
+      .card{
+        padding:24px 18px;
+        border-radius:16px;
+        box-shadow:0 0 18px rgba(25,255,94,.18) inset,0 0 28px rgba(0,0,0,.6);
+      }
+
+      h1{
+        /* Same clamp, but lighter stroke for small screens so it stays crisp */
+        -webkit-text-stroke:1px rgba(0,0,0,.65);
+        letter-spacing:2px;
+        margin-bottom:14px;
+      }
+
+      .subtitle{
+        letter-spacing:2px;
+        margin-bottom:22px;
+        opacity:.95;
+      }
+
+      .cta{
+        gap:12px;
+        justify-content:center;
+      }
+
+      /* Two-column, thumb-friendly buttons on phones */
+      .btn{
+        width:calc(50% - 6px);
+        min-width:140px;
+        height:52px;
+        font-size:20px;
+        padding:0 18px;
+      }
+
+      .audio-toggle{
+        right:12px;bottom:12px;width:48px;height:48px;font-size:18px;
+      }
+
+      .scanlines{ opacity:.06; } /* slightly softer on small displays */
+    }
   </style>
 </head>
 <body>
@@ -87,8 +205,25 @@
   <div class="crt-grid" aria-hidden="true"></div>
   <div class="scanlines" aria-hidden="true"></div>
 
+  <!-- ===== Mobile Top Bar (phones only) ===== -->
+  <header class="mobile-topbar" aria-label="Mobile navigation">
+    <div class="brand">ARYAN</div>
+    <button id="hamburger" class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">☰</button>
+  </header>
+
+  <nav id="mobileMenu" class="mobile-menu" aria-hidden="true">
+    <div class="menu-grid">
+      <a class="mobile-link" href="https://calendar.google.com/" target="_blank">Calendar</a>
+      <a class="mobile-link" href="https://outlook.office.com/" target="_blank">Outlook</a>
+      <a class="mobile-link" href="https://chatgpt.com/" target="_blank">ChatGPT</a>
+      <a class="mobile-link" href="https://www.google.com/" target="_blank">Google</a>
+      <a class="mobile-link" href="#home" onclick="location.reload();return false;">Home</a>
+    </div>
+  </nav>
+  <!-- ===== /Mobile Top Bar ===== -->
+
   <audio id="bgm" preload="auto" loop>
-    <source src="Punkrock.mp3" type="audio/mpeg">
+    <source src="Tron.mp3" type="audio/mpeg">
   </audio>
 
   <button id="audioToggle" class="audio-toggle" aria-label="Play background music" aria-pressed="false">🔇</button>
@@ -97,7 +232,7 @@
     <section class="card">
       <h1>Welcome back Aryan</h1>
       <p class="subtitle">SYSTEM ONLINE · ACCESS YOUR HUB</p>
-      <nav class="cta">
+      <nav class="cta" aria-label="Primary">
         <a class="btn" href="https://calendar.google.com/" target="_blank">Calendar</a>
         <a class="btn" href="https://outlook.office.com/" target="_blank">Outlook</a>
         <a class="btn" href="https://chatgpt.com/" target="_blank">ChatGPT</a>
@@ -108,17 +243,44 @@
   </main>
 
   <script>
+    // Audio toggle
     (function(){
       const btn=document.getElementById('audioToggle');
       const audio=document.getElementById('bgm');
       if(!btn||!audio)return;
       audio.volume=0.14;
-      function updateIcon(){btn.textContent=audio.paused?'🔇':'🔊';}
+      function updateIcon(){btn.textContent=audio.paused?'🔇':'🔊';btn.setAttribute('aria-pressed', String(!audio.paused));}
       btn.addEventListener('click',()=>{
         if(audio.paused){audio.muted=false;audio.play().catch(()=>{});} else {audio.pause();}
         updateIcon();
       });
       updateIcon();
+    })();
+
+    // Mobile hamburger menu toggle (phones only)
+    (function(){
+      const btn = document.getElementById('hamburger');
+      const menu = document.getElementById('mobileMenu');
+      if(!btn || !menu) return;
+
+      function toggle(open){
+        const isOpen = (open !== undefined) ? open : !menu.classList.contains('open');
+        menu.classList.toggle('open', isOpen);
+        menu.setAttribute('aria-hidden', String(!isOpen));
+        btn.setAttribute('aria-expanded', String(isOpen));
+        btn.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+      }
+
+      btn.addEventListener('click', ()=>toggle());
+      // Close menu when tapping a link
+      menu.addEventListener('click', (e)=>{
+        const target = e.target;
+        if(target.closest('a')) toggle(false);
+      });
+      // Optional: close on ESC
+      document.addEventListener('keydown',(e)=>{
+        if(e.key==='Escape') toggle(false);
+      });
     })();
   </script>
 </body>
