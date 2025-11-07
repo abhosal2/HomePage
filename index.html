@@ -20,11 +20,10 @@
     body{
       font-family:'VT323',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
       color:var(--text);
-      background:#000; /* solid base so grid pops */
+      background:#000;
       overflow:hidden;
     }
 
-    /* ===== Full-viewport CRT grid ===== */
     .crt-grid{
       position:fixed;inset:0;z-index:-1;
       background-image:
@@ -33,7 +32,6 @@
       box-shadow:inset 0 -160px 120px -40px rgba(25,255,94,0.25);
     }
 
-    /* optional faint scanlines */
     .scanlines{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.08;
       background-image:repeating-linear-gradient(0deg,rgba(255,255,255,0.7) 0 1px,transparent 1px 3px);
       mix-blend-mode:screen;
@@ -73,7 +71,6 @@
     }
     .btn:hover{transform:translateY(-1px);border-color:rgba(25,255,94,.8);box-shadow:0 0 18px rgba(25,255,94,.35),0 0 24px rgba(25,255,94,.25) inset;}
 
-    /* Audio Toggle */
     .audio-toggle{
       position:fixed;right:16px;bottom:16px;z-index:9999;
       width:44px;height:44px;border-radius:12px;border:1px solid rgba(25,255,94,.45);
@@ -91,7 +88,7 @@
   <div class="scanlines" aria-hidden="true"></div>
 
   <audio id="bgm" preload="auto" loop>
-    <source src="end_of_line.mp3" type="audio/mpeg">
+    <source src="Tron.mp3" type="audio/mpeg">
   </audio>
 
   <button id="audioToggle" class="audio-toggle" aria-label="Play background music" aria-pressed="false">🔇</button>
@@ -101,8 +98,9 @@
       <h1>Welcome back Aryan</h1>
       <p class="subtitle">SYSTEM ONLINE · ACCESS YOUR HUB</p>
       <nav class="cta">
-        <a class="btn" href="https://calendar.google.com/" target="_blank">Google Calendar</a>
+        <a class="btn" href="https://calendar.google.com/" target="_blank">Calendar</a>
         <a class="btn" href="https://outlook.office.com/" target="_blank">Outlook</a>
+        <a class="btn" href="https://chatgpt.com/" target="_blank">ChatGPT</a>
         <a class="btn" href="https://www.google.com/" target="_blank">Google</a>
         <a class="btn" href="#home" onclick="location.reload();return false;">Home</a>
       </nav>
@@ -110,7 +108,6 @@
   </main>
 
   <script>
-    // Audio toggle
     (function(){
       const btn=document.getElementById('audioToggle');
       const audio=document.getElementById('bgm');
