@@ -6,6 +6,10 @@
   <title>Aryan | Home</title>
   <!-- CRT-style font -->
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+  <!-- Preload audio (same folder as this HTML). Adjust path if needed. -->
+  <link rel="preload" as="audio" href="./Punkrock.mp3" type="audio/mpeg">
+
   <style>
     :root{
       --bg:#05060f;
@@ -213,17 +217,18 @@
 
   <nav id="mobileMenu" class="mobile-menu" aria-hidden="true">
     <div class="menu-grid">
-      <a class="mobile-link" href="https://calendar.google.com/" target="_blank">Calendar</a>
-      <a class="mobile-link" href="https://outlook.office.com/" target="_blank">Outlook</a>
-      <a class="mobile-link" href="https://chatgpt.com/" target="_blank">ChatGPT</a>
-      <a class="mobile-link" href="https://www.google.com/" target="_blank">Google</a>
+      <a class="mobile-link" href="https://calendar.google.com/" target="_blank" rel="noopener">Calendar</a>
+      <a class="mobile-link" href="https://outlook.office.com/" target="_blank" rel="noopener">Outlook</a>
+      <a class="mobile-link" href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT</a>
+      <a class="mobile-link" href="https://www.google.com/" target="_blank" rel="noopener">Google</a>
       <a class="mobile-link" href="#home" onclick="location.reload();return false;">Home</a>
     </div>
   </nav>
   <!-- ===== /Mobile Top Bar ===== -->
 
-  <audio id="bgm" preload="auto" loop>
-    <source src="Tron.mp3" type="audio/mpeg">
+  <!-- Updated audio element: points to Punkrock.mp3, starts muted, allows autoplay -->
+  <audio id="bgm" preload="auto" loop muted autoplay playsinline>
+    <source src="./Punkrock.mp3?v=1" type="audio/mpeg">
   </audio>
 
   <button id="audioToggle" class="audio-toggle" aria-label="Play background music" aria-pressed="false">🔇</button>
@@ -233,28 +238,86 @@
       <h1>Welcome back Aryan</h1>
       <p class="subtitle">SYSTEM ONLINE · ACCESS YOUR HUB</p>
       <nav class="cta" aria-label="Primary">
-        <a class="btn" href="https://calendar.google.com/" target="_blank">Calendar</a>
-        <a class="btn" href="https://outlook.office.com/" target="_blank">Outlook</a>
-        <a class="btn" href="https://chatgpt.com/" target="_blank">ChatGPT</a>
-        <a class="btn" href="https://www.google.com/" target="_blank">Google</a>
+        <a class="btn" href="https://calendar.google.com/" target="_blank" rel="noopener">Calendar</a>
+        <a class="btn" href="https://outlook.office.com/" target="_blank" rel="noopener">Outlook</a>
+        <a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT</a>
+        <a class="btn" href="https://www.google.com/" target="_blank" rel="noopener">Google</a>
         <a class="btn" href="#home" onclick="location.reload();return false;">Home</a>
       </nav>
     </section>
   </main>
 
   <script>
-    // Audio toggle
+    // Audio toggle + autoplay policy friendly boot
     (function(){
-      const btn=document.getElementById('audioToggle');
-      const audio=document.getElementById('bgm');
-      if(!btn||!audio)return;
-      audio.volume=0.14;
-      function updateIcon(){btn.textContent=audio.paused?'🔇':'🔊';btn.setAttribute('aria-pressed', String(!audio.paused));}
-      btn.addEventListener('click',()=>{
-        if(audio.paused){audio.muted=false;audio.play().catch(()=>{});} else {audio.pause();}
-        updateIcon();
+      const btn = document.getElementById('audioToggle');
+      const audio = document.getElementById('bgm');
+      if(!btn || !audio) return;
+
+      let bootstrapped = false;        // ensures we only try once
+      audio.volume = 0.14;
+
+      function updateIcon(){
+        btn.textContent = audio.paused ? '🔇' : '🔊';
+        btn.setAttribute('aria-pressed', String(!audio.paused));
+      }
+
+      // Try to start muted (allowed), then user gesture will unmute
+      function tryStartMuted(){
+        if (bootstrapped) return;
+        bootstrapped = true;
+        audio.play().catch(()=>{/* ignore: will start after user gesture */});
+      }
+
+      // On first user interaction anywhere, ensure playback and unmute if requested
+      function unlockAudio(unmute=false){
+        const start = () => {
+          if (unmute) audio.muted = false;
+          return audio.play().then(updateIcon).catch(err=>{
+            console.warn('Autoplay blocked until explicit user action:', err);
+            updateIcon();
+          });
+        };
+        if (audio.readyState >= 2) {
+          start();
+        } else {
+          audio.addEventListener('canplaythrough', start, { once:true });
+        }
+      }
+
+      // Button explicitly toggles play/pause (and unmutes when starting)
+      btn.addEventListener('click', ()=>{
+        if (audio.paused){
+          unlockAudio(true); // unmute + play
+        } else {
+          audio.pause();
+          updateIcon();
+        }
       });
+
+      // Keep icon in sync with real media state
+      audio.addEventListener('play', updateIcon);
+      audio.addEventListener('pause', updateIcon);
+
+      // First user gesture anywhere on the page: begin playback (stay muted)
+      const firstGesture = () => {
+        unlockAudio(false);
+        window.removeEventListener('pointerdown', firstGesture);
+        window.removeEventListener('keydown', firstGesture);
+        window.removeEventListener('touchstart', firstGesture);
+      };
+      window.addEventListener('pointerdown', firstGesture, { once:true });
+      window.addEventListener('keydown', firstGesture, { once:true });
+      window.addEventListener('touchstart', firstGesture, { once:true });
+
+      // Kick off a best-effort muted start immediately
+      tryStartMuted();
       updateIcon();
+
+      // Helpful diagnostics if the file path/case is wrong
+      audio.addEventListener('error', ()=>{
+        console.error('Audio failed to load. Check that "Punkrock.mp3" exists, spelling/case match exactly, and it is in the SAME folder as this HTML (or update the src path).');
+      });
     })();
 
     // Mobile hamburger menu toggle (phones only)
