@@ -129,50 +129,58 @@
       transition:opacity .4s ease .05s, transform .4s ease .05s;
     }
 
-    /* ===== INTRO OVERLAY ===== */
+    /* ===== INTRO OVERLAY (dual beams) ===== */
     .intro{
       position:fixed; inset:0; z-index:9998;
       background:#000;
-      display:grid; place-items:end center;
       overflow:hidden;
-      /* fade away at end */
       opacity:1;
       pointer-events:auto;
     }
 
-    /* The single green light “grid” beam */
     .beam{
-      width:100%;
-      height:0;
+      position:absolute; left:0; right:0;
       background:
-        /* grid lines inside the beam */
         repeating-linear-gradient(0deg,transparent 0 calc(var(--cell) - 1px), rgba(25,255,94,0.55) calc(var(--cell) - 1px) var(--cell)),
         repeating-linear-gradient(90deg,transparent 0 calc(var(--cell) - 1px), rgba(25,255,94,0.55) calc(var(--cell) - 1px) var(--cell));
       box-shadow:
         0 0 24px rgba(25,255,94,.45),
         0 0 80px rgba(25,255,94,.3),
         0 -40px 120px -10px rgba(25,255,94,.25) inset;
-      animation: beam-rise var(--intro-rise) cubic-bezier(.22,.85,.3,1) forwards,
-                 beam-hold var(--intro-hold) linear forwards var(--intro-rise);
+      filter:brightness(1);
     }
 
-    /* After beam holds at mid, quickly bloom a soft flash to reveal page */
+    .beam--top{
+      top:0; height:0; transform-origin:top center;
+      animation: beam-down var(--intro-rise) cubic-bezier(.22,.85,.3,1) forwards,
+                 beam-bright var(--intro-hold) linear forwards var(--intro-rise);
+    }
+
+    .beam--bottom{
+      bottom:0; height:0; transform-origin:bottom center;
+      animation: beam-up var(--intro-rise) cubic-bezier(.22,.85,.3,1) forwards,
+                 beam-bright var(--intro-hold) linear forwards var(--intro-rise);
+    }
+
+    /* Soft glow where they meet */
+    .meet-glow{
+      position:absolute; left:0; right:0; top:50%;
+      height:1px; transform:translateY(-.5px);
+      background: radial-gradient(closest-side, rgba(25,255,94,.55), rgba(25,255,94,.18) 60%, transparent 70%);
+      opacity:0;
+      pointer-events:none;
+      animation: meet-pop .28s ease forwards calc(var(--intro-rise));
+    }
+
     .intro.reveal{
       animation: intro-fade var(--intro-fade) ease forwards;
     }
 
-    @keyframes beam-rise{
-      0%   { height:0; }
-      100% { height:50vh; }
-    }
-    @keyframes beam-hold{
-      0%   { filter:brightness(1); }
-      100% { filter:brightness(1.15); }
-    }
-    @keyframes intro-fade{
-      0%   { opacity:1; }
-      100% { opacity:0; pointer-events:none; }
-    }
+    @keyframes beam-down{ 0%{height:0} 100%{height:50vh} }
+    @keyframes beam-up  { 0%{height:0} 100%{height:50vh} }
+    @keyframes beam-bright{ 0%{filter:brightness(1)} 100%{filter:brightness(1.15)} }
+    @keyframes meet-pop{ 0%{opacity:0; transform:translateY(-.5px) scaleY(0.6)} 100%{opacity:1; transform:translateY(-.5px) scaleY(1)} }
+    @keyframes intro-fade{ 0%{opacity:1} 100%{opacity:0; pointer-events:none} }
 
     /* ===== Mobile-only polish (does NOT affect laptops/desktops) ===== */
     @media (max-width: 640px){
@@ -274,7 +282,7 @@
 
     /* Accessibility: respect reduced motion */
     @media (prefers-reduced-motion: reduce){
-      .intro, .beam{ animation:none !important; }
+      .intro, .beam, .meet-glow{ animation:none !important; }
       body{ overflow:auto; }
       .wrap{ opacity:1; transform:none; }
       #audioToggle{ opacity:1; transform:none; pointer-events:auto; }
@@ -287,9 +295,11 @@
   <div class="crt-grid" aria-hidden="true"></div>
   <div class="scanlines" aria-hidden="true"></div>
 
-  <!-- ===== Intro Overlay ===== -->
+  <!-- ===== Intro Overlay: two beams meet at center ===== -->
   <div id="intro" class="intro" aria-hidden="true">
-    <div class="beam"></div>
+    <div class="beam beam--top"></div>
+    <div class="beam beam--bottom"></div>
+    <div class="meet-glow"></div>
   </div>
 
   <!-- ===== Mobile Top Bar (phones only) ===== -->
@@ -309,7 +319,7 @@
   </nav>
   <!-- ===== /Mobile Top Bar ===== -->
 
-  <!-- Updated audio element -->
+  <!-- Audio -->
   <audio id="bgm" preload="auto" loop muted autoplay playsinline>
     <source src="./Punkrock.mp3?v=1" type="audio/mpeg">
   </audio>
@@ -331,13 +341,11 @@
   </main>
 
   <script>
-    // ===== Intro sequencing =====
+    // ===== Intro sequencing (two beams -> meet -> fade -> reveal) =====
     (function(){
       const intro = document.getElementById('intro');
-      const beam = intro?.querySelector('.beam');
       const root = document.documentElement;
 
-      // Skip intro if user prefers reduced motion
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (reduced){
         document.body.classList.add('revealed');
@@ -345,7 +353,6 @@
         return;
       }
 
-      // Compute total duration from CSS custom properties
       const parseTime = v => {
         if(!v) return 0;
         v = String(v).trim();
@@ -358,11 +365,12 @@
       const fade = parseTime(getComputedStyle(root).getPropertyValue('--intro-fade'));
       const total = rise + hold + fade;
 
-      // After rise+hold, start fading the overlay; then reveal page
+      // After both beams reach the center and hold briefly, fade the overlay
       setTimeout(()=> intro?.classList.add('reveal'), rise + hold);
+
+      // Then reveal the page and remove overlay
       setTimeout(()=>{
         document.body.classList.add('revealed');
-        // Fully remove intro from DOM to free events and allow interaction everywhere
         setTimeout(()=> intro?.remove(), fade + 50);
       }, total);
     })();
@@ -373,7 +381,7 @@
       const audio = document.getElementById('bgm');
       if(!btn || !audio) return;
 
-      let bootstrapped = false;        // ensures we only try once
+      let bootstrapped = false;
       audio.volume = 0.14;
 
       function updateIcon(){
@@ -381,14 +389,12 @@
         btn.setAttribute('aria-pressed', String(!audio.paused));
       }
 
-      // Try to start muted (allowed), then user gesture will unmute
       function tryStartMuted(){
         if (bootstrapped) return;
         bootstrapped = true;
-        audio.play().catch(()=>{/* ignore: will start after user gesture */});
+        audio.play().catch(()=>{/* wait for user gesture */});
       }
 
-      // On first user interaction anywhere, ensure playback and unmute if requested
       function unlockAudio(unmute=false){
         const start = () => {
           if (unmute) audio.muted = false;
@@ -397,28 +403,18 @@
             updateIcon();
           });
         };
-        if (audio.readyState >= 2) {
-          start();
-        } else {
-          audio.addEventListener('canplaythrough', start, { once:true });
-        }
+        if (audio.readyState >= 2) start();
+        else audio.addEventListener('canplaythrough', start, { once:true });
       }
 
-      // Button explicitly toggles play/pause (and unmutes when starting)
       btn.addEventListener('click', ()=>{
-        if (audio.paused){
-          unlockAudio(true); // unmute + play
-        } else {
-          audio.pause();
-          updateIcon();
-        }
+        if (audio.paused){ unlockAudio(true); }
+        else { audio.pause(); updateIcon(); }
       });
 
-      // Keep icon in sync with real media state
       audio.addEventListener('play', updateIcon);
       audio.addEventListener('pause', updateIcon);
 
-      // First user gesture anywhere on the page: begin playback (stay muted)
       const firstGesture = () => {
         unlockAudio(false);
         window.removeEventListener('pointerdown', firstGesture);
@@ -429,13 +425,11 @@
       window.addEventListener('keydown', firstGesture, { once:true });
       window.addEventListener('touchstart', firstGesture, { once:true });
 
-      // Kick off a best-effort muted start immediately
       tryStartMuted();
       updateIcon();
 
-      // Helpful diagnostics if the file path/case is wrong
       audio.addEventListener('error', ()=>{
-        console.error('Audio failed to load. Check that "Punkrock.mp3" exists, spelling/case match exactly, and it is in the SAME folder as this HTML (or update the src path).');
+        console.error('Audio failed to load. Check that "Punkrock.mp3" exists, exact casing, and path.');
       });
     })();
 
@@ -454,12 +448,10 @@
       }
 
       btn.addEventListener('click', ()=>toggle());
-      // Close menu when tapping a link
       menu.addEventListener('click', (e)=>{
         const target = e.target;
         if(target.closest('a')) toggle(false);
       });
-      // Optional: close on ESC
       document.addEventListener('keydown',(e)=>{
         if(e.key==='Escape') toggle(false);
       });
