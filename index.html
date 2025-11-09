@@ -17,6 +17,11 @@
       --text:#c9ffd8;
       --cell:60px;           /* desktop default */
       --maxw:1000px;
+
+      /* Intro timing */
+      --intro-rise:1.6s;
+      --intro-hold:0.3s;
+      --intro-fade:0.6s;
     }
 
     *{box-sizing:border-box;margin:0;padding:0}
@@ -48,6 +53,15 @@
 
     .wrap{
       position:relative;z-index:1;height:100vh;display:grid;place-items:center;text-align:center;padding:40px;
+
+      /* Start hidden until intro completes */
+      opacity:0;
+      transform:translateY(8px);
+      transition:opacity .5s ease, transform .5s ease;
+    }
+    body.revealed .wrap{
+      opacity:1;
+      transform:none;
     }
 
     /* Ensure modern mobile browsers use the “small viewport” height accounting for UI chrome */
@@ -98,11 +112,67 @@
       color:var(--text);font-size:18px;cursor:pointer;
       box-shadow:0 0 12px rgba(25,255,94,.22) inset,0 0 22px rgba(25,255,94,.16);
       transition:transform .12s ease,box-shadow .2s ease,border-color .2s ease;
+      opacity:0; transform:translateY(6px);
+      pointer-events:none;
+      transition:opacity .4s ease .05s, transform .4s ease .05s;
+    }
+    body.revealed #audioToggle{
+      opacity:1; transform:none; pointer-events:auto;
     }
     .audio-toggle:hover{transform:translateY(-1px);border-color:rgba(25,255,94,.8);box-shadow:0 0 18px rgba(25,255,94,.25),0 0 28px rgba(25,255,94,.28) inset;}
 
     /* ===== Mobile-only top bar (hidden on larger screens) ===== */
     .mobile-topbar, .mobile-menu{ display:none; }
+    body.revealed .mobile-topbar{ opacity:1; transform:none; }
+    .mobile-topbar{
+      opacity:0; transform:translateY(-6px);
+      transition:opacity .4s ease .05s, transform .4s ease .05s;
+    }
+
+    /* ===== INTRO OVERLAY ===== */
+    .intro{
+      position:fixed; inset:0; z-index:9998;
+      background:#000;
+      display:grid; place-items:end center;
+      overflow:hidden;
+      /* fade away at end */
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    /* The single green light “grid” beam */
+    .beam{
+      width:100%;
+      height:0;
+      background:
+        /* grid lines inside the beam */
+        repeating-linear-gradient(0deg,transparent 0 calc(var(--cell) - 1px), rgba(25,255,94,0.55) calc(var(--cell) - 1px) var(--cell)),
+        repeating-linear-gradient(90deg,transparent 0 calc(var(--cell) - 1px), rgba(25,255,94,0.55) calc(var(--cell) - 1px) var(--cell));
+      box-shadow:
+        0 0 24px rgba(25,255,94,.45),
+        0 0 80px rgba(25,255,94,.3),
+        0 -40px 120px -10px rgba(25,255,94,.25) inset;
+      animation: beam-rise var(--intro-rise) cubic-bezier(.22,.85,.3,1) forwards,
+                 beam-hold var(--intro-hold) linear forwards var(--intro-rise);
+    }
+
+    /* After beam holds at mid, quickly bloom a soft flash to reveal page */
+    .intro.reveal{
+      animation: intro-fade var(--intro-fade) ease forwards;
+    }
+
+    @keyframes beam-rise{
+      0%   { height:0; }
+      100% { height:50vh; }
+    }
+    @keyframes beam-hold{
+      0%   { filter:brightness(1); }
+      100% { filter:brightness(1.15); }
+    }
+    @keyframes intro-fade{
+      0%   { opacity:1; }
+      100% { opacity:0; pointer-events:none; }
+    }
 
     /* ===== Mobile-only polish (does NOT affect laptops/desktops) ===== */
     @media (max-width: 640px){
@@ -170,7 +240,6 @@
       }
 
       h1{
-        /* Same clamp, but lighter stroke for small screens so it stays crisp */
         -webkit-text-stroke:1px rgba(0,0,0,.65);
         letter-spacing:2px;
         margin-bottom:14px;
@@ -202,12 +271,26 @@
 
       .scanlines{ opacity:.06; } /* slightly softer on small displays */
     }
+
+    /* Accessibility: respect reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      .intro, .beam{ animation:none !important; }
+      body{ overflow:auto; }
+      .wrap{ opacity:1; transform:none; }
+      #audioToggle{ opacity:1; transform:none; pointer-events:auto; }
+      .intro{ display:none; }
+    }
   </style>
 </head>
 <body>
   <!-- Background grid and scanlines -->
   <div class="crt-grid" aria-hidden="true"></div>
   <div class="scanlines" aria-hidden="true"></div>
+
+  <!-- ===== Intro Overlay ===== -->
+  <div id="intro" class="intro" aria-hidden="true">
+    <div class="beam"></div>
+  </div>
 
   <!-- ===== Mobile Top Bar (phones only) ===== -->
   <header class="mobile-topbar" aria-label="Mobile navigation">
@@ -226,7 +309,7 @@
   </nav>
   <!-- ===== /Mobile Top Bar ===== -->
 
-  <!-- Updated audio element: points to Punkrock.mp3, starts muted, allows autoplay -->
+  <!-- Updated audio element -->
   <audio id="bgm" preload="auto" loop muted autoplay playsinline>
     <source src="./Punkrock.mp3?v=1" type="audio/mpeg">
   </audio>
@@ -248,7 +331,43 @@
   </main>
 
   <script>
-    // Audio toggle + autoplay policy friendly boot
+    // ===== Intro sequencing =====
+    (function(){
+      const intro = document.getElementById('intro');
+      const beam = intro?.querySelector('.beam');
+      const root = document.documentElement;
+
+      // Skip intro if user prefers reduced motion
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduced){
+        document.body.classList.add('revealed');
+        intro?.remove();
+        return;
+      }
+
+      // Compute total duration from CSS custom properties
+      const parseTime = v => {
+        if(!v) return 0;
+        v = String(v).trim();
+        if(v.endsWith('ms')) return parseFloat(v);
+        if(v.endsWith('s'))  return parseFloat(v)*1000;
+        return parseFloat(v)||0;
+      };
+      const rise = parseTime(getComputedStyle(root).getPropertyValue('--intro-rise'));
+      const hold = parseTime(getComputedStyle(root).getPropertyValue('--intro-hold'));
+      const fade = parseTime(getComputedStyle(root).getPropertyValue('--intro-fade'));
+      const total = rise + hold + fade;
+
+      // After rise+hold, start fading the overlay; then reveal page
+      setTimeout(()=> intro?.classList.add('reveal'), rise + hold);
+      setTimeout(()=>{
+        document.body.classList.add('revealed');
+        // Fully remove intro from DOM to free events and allow interaction everywhere
+        setTimeout(()=> intro?.remove(), fade + 50);
+      }, total);
+    })();
+
+    // ===== Audio toggle + autoplay policy friendly boot =====
     (function(){
       const btn = document.getElementById('audioToggle');
       const audio = document.getElementById('bgm');
@@ -320,7 +439,7 @@
       });
     })();
 
-    // Mobile hamburger menu toggle (phones only)
+    // ===== Mobile hamburger menu toggle (phones only) =====
     (function(){
       const btn = document.getElementById('hamburger');
       const menu = document.getElementById('mobileMenu');
