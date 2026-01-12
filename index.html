@@ -4,8 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Aryan | Home</title>
+
+  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-  <link rel="preload" as="audio" href="./Punkrock.mp3" type="audio/mpeg">
 
   <style>
     :root{
@@ -18,6 +19,7 @@
 
     *{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%}
+
     body{
       font-family:'VT323',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
       color:var(--text);
@@ -34,22 +36,49 @@
       to { opacity: 1; }
     }
 
+    /* CRT grid */
     .crt-grid{
-      position:fixed;inset:0;z-index:-1;
+      position:fixed;
+      inset:0;
+      z-index:-1;
       background-image:
-        repeating-linear-gradient(0deg,transparent 0 calc(var(--cell) - 1px), rgba(25,255,94,0.45) calc(var(--cell) - 1px) var(--cell)),
-        repeating-linear-gradient(90deg,transparent 0 calc(var(--cell) - 1px), rgba(25,255,94,0.45) calc(var(--cell) - 1px) var(--cell));
+        repeating-linear-gradient(
+          0deg,
+          transparent 0 calc(var(--cell) - 1px),
+          rgba(25,255,94,0.45) calc(var(--cell) - 1px) var(--cell)
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent 0 calc(var(--cell) - 1px),
+          rgba(25,255,94,0.45) calc(var(--cell) - 1px) var(--cell)
+        );
       box-shadow:inset 0 -160px 120px -40px rgba(25,255,94,0.25);
     }
 
+    /* Scanlines */
     .scanlines{
-      position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.08;
-      background-image:repeating-linear-gradient(0deg,rgba(255,255,255,0.7) 0 1px,transparent 1px 3px);
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      pointer-events:none;
+      opacity:.08;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          rgba(255,255,255,0.7) 0 1px,
+          transparent 1px 3px
+        );
       mix-blend-mode:screen;
     }
 
     .wrap{
-      position:relative;z-index:1;height:100vh;display:grid;place-items:center;text-align:center;padding:40px;
+      position:relative;
+      z-index:1;
+      height:100vh;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      padding:40px;
     }
 
     @supports (height: 100svh){
@@ -61,78 +90,136 @@
       background:rgba(0,0,0,.55);
       border:1px solid rgba(25,255,94,.35);
       border-radius:20px;
-      box-shadow:0 0 24px rgba(25,255,94,.2) inset,0 0 40px rgba(0,0,0,.6);
+      box-shadow:
+        0 0 24px rgba(25,255,94,.2) inset,
+        0 0 40px rgba(0,0,0,.6);
       padding:40px;
     }
 
     h1{
       font-size:clamp(40px,12vw,120px);
-      line-height:.9;letter-spacing:4px;text-transform:uppercase;
+      line-height:.9;
+      letter-spacing:4px;
+      text-transform:uppercase;
       color:var(--crt-green);
-      text-shadow:0 0 6px rgba(25,255,94,.9),0 0 18px rgba(25,255,94,.5),0 0 32px rgba(25,255,94,.35);
+      text-shadow:
+        0 0 6px rgba(25,255,94,.9),
+        0 0 18px rgba(25,255,94,.5),
+        0 0 32px rgba(25,255,94,.35);
       -webkit-text-stroke:2px rgba(0,0,0,.6);
       margin-bottom:18px;
     }
 
     .subtitle{
-      font-size:clamp(16px,3.2vw,26px);letter-spacing:4px;text-transform:uppercase;color:#a9ffc7;opacity:.9;margin-bottom:28px;
+      font-size:clamp(16px,3.2vw,26px);
+      letter-spacing:4px;
+      text-transform:uppercase;
+      color:#a9ffc7;
+      opacity:.9;
+      margin-bottom:28px;
     }
 
-    .cta{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:center;}
+    .cta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:16px;
+      align-items:center;
+      justify-content:center;
+    }
 
     .btn{
-      height:56px;padding:0 26px;border-radius:12px;text-decoration:none;display:grid;place-items:center;
-      color:var(--crt-green);font-size:22px;letter-spacing:2px;
+      height:56px;
+      padding:0 26px;
+      border-radius:12px;
+      text-decoration:none;
+      display:grid;
+      place-items:center;
+      color:var(--crt-green);
+      font-size:22px;
+      letter-spacing:2px;
       border:1px solid rgba(25,255,94,.4);
       background:rgba(0,0,0,.65);
-      box-shadow:0 0 14px rgba(25,255,94,.25) inset,0 0 18px rgba(25,255,94,.18);
-      transition:transform .12s ease,box-shadow .2s ease,border-color .2s ease;
+      box-shadow:
+        0 0 14px rgba(25,255,94,.25) inset,
+        0 0 18px rgba(25,255,94,.18);
+      transition:
+        transform .12s ease,
+        box-shadow .2s ease,
+        border-color .2s ease;
       touch-action:manipulation;
     }
-    .btn:hover{transform:translateY(-1px);border-color:rgba(25,255,94,.8);box-shadow:0 0 18px rgba(25,255,94,.35),0 0 24px rgba(25,255,94,.25) inset;}
 
-    .audio-toggle{
-      position:fixed;right:16px;bottom:16px;z-index:9999;
-      width:44px;height:44px;border-radius:12px;border:1px solid rgba(25,255,94,.45);
-      background:rgba(0,0,0,.8);
-      color:var(--text);font-size:18px;cursor:pointer;
-      box-shadow:0 0 12px rgba(25,255,94,.22) inset,0 0 22px rgba(25,255,94,.16);
-      transition:transform .12s ease,box-shadow .2s ease,border-color .2s ease;
+    .btn:hover{
+      transform:translateY(-1px);
+      border-color:rgba(25,255,94,.8);
+      box-shadow:
+        0 0 18px rgba(25,255,94,.35),
+        0 0 24px rgba(25,255,94,.25) inset;
     }
-    .audio-toggle:hover{transform:translateY(-1px);border-color:rgba(25,255,94,.8);box-shadow:0 0 18px rgba(25,255,94,.25),0 0 28px rgba(25,255,94,.28) inset;}
 
-    .mobile-topbar, .mobile-menu{ display:none; }
+    /* Mobile menu */
+    .mobile-topbar,
+    .mobile-menu{
+      display:none;
+    }
 
     @media (max-width: 640px){
       :root{
         --cell:34px;
         --maxw:560px;
       }
+
       body{ overflow:auto; }
 
       .mobile-topbar{
-        position:fixed;top:0;left:0;right:0;z-index:1000;
+        position:fixed;
+        top:0;
+        left:0;
+        right:0;
+        z-index:1000;
         height:56px;
-        display:flex;align-items:center;justify-content:space-between;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
         padding:0 14px;
         background:rgba(0,0,0,.7);
         border-bottom:1px solid rgba(25,255,94,.35);
         box-shadow:0 6px 16px rgba(0,0,0,.5);
         backdrop-filter:blur(6px);
       }
+
       .brand{
         color:var(--crt-green);
-        font-size:24px;letter-spacing:3px;text-transform:uppercase;
-        text-shadow:0 0 6px rgba(25,255,94,.7),0 0 16px rgba(25,255,94,.3);
+        font-size:24px;
+        letter-spacing:3px;
+        text-transform:uppercase;
+        text-shadow:
+          0 0 6px rgba(25,255,94,.7),
+          0 0 16px rgba(25,255,94,.3);
       }
+
       .hamburger{
-        width:44px;height:44px;border-radius:10px;border:1px solid rgba(25,255,94,.45);
-        background:rgba(0,0,0,.85);color:var(--text);font-size:22px;cursor:pointer;
-        display:grid;place-items:center;
-        box-shadow:0 0 12px rgba(25,255,94,.22) inset,0 0 22px rgba(25,255,94,.16);
+        width:44px;
+        height:44px;
+        border-radius:10px;
+        border:1px solid rgba(25,255,94,.45);
+        background:rgba(0,0,0,.85);
+        color:var(--text);
+        font-size:22px;
+        cursor:pointer;
+        display:grid;
+        place-items:center;
+        box-shadow:
+          0 0 12px rgba(25,255,94,.22) inset,
+          0 0 22px rgba(25,255,94,.16);
       }
+
       .mobile-menu{
-        position:fixed;top:56px;left:0;right:0;z-index:999;
+        position:fixed;
+        top:56px;
+        left:0;
+        right:0;
+        z-index:999;
         display:block;
         transform:translateY(-110%);
         transition:transform .22s ease;
@@ -140,38 +227,84 @@
         border-bottom:1px solid rgba(25,255,94,.35);
         backdrop-filter:blur(6px);
       }
-      .mobile-menu.open{ transform:translateY(0); }
-      .mobile-menu .menu-grid{
-        display:grid;grid-template-columns:1fr 1fr;gap:12px;
+
+      .mobile-menu.open{
+        transform:translateY(0);
+      }
+
+      .menu-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:12px;
         padding:14px;
       }
+
       .mobile-link{
-        height:48px;display:grid;place-items:center;text-decoration:none;border-radius:12px;
+        height:48px;
+        display:grid;
+        place-items:center;
+        text-decoration:none;
+        border-radius:12px;
         border:1px solid rgba(25,255,94,.35);
-        color:var(--crt-green);font-size:18px;letter-spacing:2px;background:rgba(0,0,0,.65);
-        box-shadow:0 0 10px rgba(25,255,94,.18) inset,0 0 18px rgba(0,0,0,.45);
+        color:var(--crt-green);
+        font-size:18px;
+        letter-spacing:2px;
+        background:rgba(0,0,0,.65);
+        box-shadow:
+          0 0 10px rgba(25,255,94,.18) inset,
+          0 0 18px rgba(0,0,0,.45);
       }
-      .wrap{padding:20px;padding-top:84px;}
-      .card{padding:24px 18px;border-radius:16px;}
-      h1{-webkit-text-stroke:1px rgba(0,0,0,.65);letter-spacing:2px;margin-bottom:14px;}
-      .subtitle{letter-spacing:2px;margin-bottom:22px;}
-      .cta{gap:12px;}
-      .btn{width:calc(50% - 6px);min-width:140px;height:52px;font-size:20px;padding:0 18px;}
-      .audio-toggle{right:12px;bottom:12px;width:48px;height:48px;font-size:18px;}
-      .scanlines{opacity:.06;}
+
+      .wrap{
+        padding:20px;
+        padding-top:84px;
+      }
+
+      .card{
+        padding:24px 18px;
+        border-radius:16px;
+      }
+
+      h1{
+        -webkit-text-stroke:1px rgba(0,0,0,.65);
+        letter-spacing:2px;
+        margin-bottom:14px;
+      }
+
+      .subtitle{
+        letter-spacing:2px;
+        margin-bottom:22px;
+      }
+
+      .cta{
+        gap:12px;
+      }
+
+      .btn{
+        width:calc(50% - 6px);
+        min-width:140px;
+        height:52px;
+        font-size:20px;
+        padding:0 18px;
+      }
+
+      .scanlines{ opacity:.06; }
     }
   </style>
 </head>
+
 <body>
   <div class="crt-grid" aria-hidden="true"></div>
   <div class="scanlines" aria-hidden="true"></div>
 
+  <!-- Mobile header -->
   <header class="mobile-topbar">
     <div class="brand">ARYAN</div>
-    <button id="hamburger" class="hamburger" aria-label="Open menu" aria-expanded="false">☰</button>
+    <button id="hamburger" class="hamburger" aria-label="Open menu">☰</button>
   </header>
 
-  <nav id="mobileMenu" class="mobile-menu" aria-hidden="true">
+  <!-- Mobile menu -->
+  <nav id="mobileMenu" class="mobile-menu">
     <div class="menu-grid">
       <a class="mobile-link" href="https://calendar.google.com/" target="_blank">Calendar</a>
       <a class="mobile-link" href="https://outlook.office.com/" target="_blank">Outlook</a>
@@ -181,11 +314,7 @@
     </div>
   </nav>
 
-  <audio id="bgm" preload="auto" loop muted autoplay playsinline>
-    <source src="./Punkrock.mp3?v=1" type="audio/mpeg">
-  </audio>
-  <button id="audioToggle" class="audio-toggle">🔇</button>
-
+  <!-- Main content -->
   <main class="wrap">
     <section class="card">
       <h1>Welcome back Aryan</h1>
@@ -200,25 +329,22 @@
     </section>
   </main>
 
+  <!-- Mobile menu script -->
   <script>
     (function(){
-      const btn=document.getElementById('audioToggle');
-      const audio=document.getElementById('bgm');
-      if(!btn||!audio)return;
-      audio.volume=0.14;
-      function update(){btn.textContent=audio.paused?'🔇':'🔊';}
-      btn.onclick=()=>{if(audio.paused){audio.muted=false;audio.play();}else{audio.pause();}update();};
-      audio.onplay=update;audio.onpause=update;
-      window.addEventListener('pointerdown',()=>{audio.play().catch(()=>{});},{once:true});
-      update();
-    })();
+      const btn = document.getElementById('hamburger');
+      const menu = document.getElementById('mobileMenu');
+      if(!btn || !menu) return;
 
-    (function(){
-      const btn=document.getElementById('hamburger');
-      const menu=document.getElementById('mobileMenu');
-      if(!btn||!menu)return;
-      btn.onclick=()=>{menu.classList.toggle('open');};
-      menu.onclick=e=>{if(e.target.closest('a'))menu.classList.remove('open');};
+      btn.onclick = () => {
+        menu.classList.toggle('open');
+      };
+
+      menu.onclick = e => {
+        if(e.target.closest('a')){
+          menu.classList.remove('open');
+        }
+      };
     })();
   </script>
 </body>
