@@ -149,13 +149,18 @@
       line-height:.9;
       letter-spacing:4px;
       text-transform:uppercase;
-      color:#fff;
-      background:linear-gradient(180deg, #ffffff 0%, #ffffff 45%, #bdbdbd 100%);
-      -webkit-background-clip:text;
-      background-clip:text;
-      -webkit-text-fill-color:transparent;
-      filter:drop-shadow(0 0 8px rgba(255,255,255,.45)) drop-shadow(0 0 24px rgba(255,255,255,.18));
+      /* Hollow outlined lettering */
+      color:transparent;
+      -webkit-text-fill-color:rgba(0,0,0,.35);
+      -webkit-text-stroke:2px #fff;
+      paint-order:stroke fill;
+      filter:drop-shadow(0 0 6px rgba(255,255,255,.45)) drop-shadow(0 0 20px rgba(255,255,255,.15));
       margin-bottom:18px;
+    }
+
+    /* Fallback for browsers without text-stroke: plain white text */
+    @supports not (-webkit-text-stroke:1px #fff){
+      h1{ color:#fff; -webkit-text-fill-color:#fff; }
     }
 
     .cursor{
@@ -164,8 +169,8 @@
       height:.8em;
       margin-left:.1em;
       vertical-align:baseline;
-      background:#fff;
-      box-shadow:0 0 12px rgba(255,255,255,.8);
+      border:2px solid #fff;
+      box-shadow:0 0 10px rgba(255,255,255,.6);
       animation:blink 1s steps(1) infinite;
     }
     @keyframes blink{ 50%{ opacity:0; } }
@@ -250,8 +255,9 @@
       body.ready .mobile-topbar{ opacity:1; }
 
       .brand{
-        color:#fff;
-        font-size:24px;
+        color:transparent;
+        -webkit-text-stroke:1px #fff;
+        font-size:26px;
         letter-spacing:3px;
         text-transform:uppercase;
         text-shadow:0 0 8px rgba(255,255,255,.5);
@@ -306,7 +312,7 @@
 
       .wrap{ padding:20px; padding-top:84px; }
       .card{ padding:24px 18px; }
-      h1{ letter-spacing:2px; margin-bottom:14px; }
+      h1{ letter-spacing:2px; margin-bottom:14px; -webkit-text-stroke:1.5px #fff; }
       .subtitle{ letter-spacing:2px; margin-bottom:22px; }
       .cta{ gap:12px; }
       .btn{
