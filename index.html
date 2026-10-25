@@ -10,9 +10,9 @@
 
   <style>
     :root{
-      --bg:#05060f;
-      --crt-green:#19ff5e;
-      --text:#c9ffd8;
+      --white:#ffffff;
+      --text:#e9e9e9;
+      --line:rgba(255,255,255,.35);
       --maxw:1000px;
     }
 
@@ -24,82 +24,84 @@
       color:var(--text);
       background:#000;
       overflow:hidden;
-      opacity:0;
-      animation: fadeIn 1.2s ease forwards;
       -webkit-font-smoothing:antialiased;
       text-rendering:optimizeLegibility;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    /* Snake LCD: a canvas of chunky pixel cells, updated frame by frame */
-    #snake{
+    /* ---------- HYPERSPACE INTRO ---------- */
+    .intro{
       position:fixed;
       inset:0;
-      z-index:-2;
-      display:block;
-      image-rendering:pixelated;
+      z-index:5000;
+      background:#000;
+      cursor:pointer;
+      transition:opacity .8s ease .35s;
+    }
+    .intro.done{ opacity:0; pointer-events:none; }
+    .intro canvas{ display:block; width:100%; height:100%; }
+
+    .intro-text{
+      position:absolute;
+      left:0; right:0;
+      bottom:20%;
+      text-align:center;
+      font-size:clamp(18px,3vw,28px);
+      letter-spacing:6px;
+      text-transform:uppercase;
+      color:#fff;
+      text-shadow:0 0 10px rgba(255,255,255,.7);
+      animation:introText 1.6s ease forwards;
+    }
+    @keyframes introText{
+      0%   { opacity:0; }
+      25%  { opacity:1; }
+      70%  { opacity:1; }
+      100% { opacity:0; }
     }
 
-    /* Bottom phosphor glow that used to live on the grid */
-    .lcd-glow{
+    .intro-skip{
+      position:absolute;
+      left:0; right:0;
+      bottom:22px;
+      text-align:center;
+      font-size:16px;
+      letter-spacing:3px;
+      text-transform:uppercase;
+      color:rgba(255,255,255,.4);
+    }
+
+    .flash{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:0;
+      background:radial-gradient(circle at center, #fff 0%, #fff 30%, rgba(255,255,255,.5) 60%, rgba(0,0,0,0) 90%);
+    }
+    .intro.done .flash{ animation:flash .9s ease-out forwards; }
+    @keyframes flash{
+      0%   { opacity:0; }
+      18%  { opacity:1; }
+      100% { opacity:0; }
+    }
+
+    /* ---------- STARFIELD BACKGROUND ---------- */
+    #stars{
       position:fixed;
       inset:0;
       z-index:-1;
-      pointer-events:none;
-      box-shadow:inset 0 -160px 120px -40px rgba(25,255,94,0.18);
+      display:block;
     }
 
-    /* Scanlines above the content so text looks like it's on the tube */
-    .scanlines{
+    /* Soft vignette so the edges fall off into black */
+    .vignette{
       position:fixed;
       inset:0;
-      z-index:2000;
+      z-index:0;
       pointer-events:none;
-      opacity:.12;
-      background-image:
-        repeating-linear-gradient(
-          0deg,
-          rgba(0,0,0,0.9) 0 1px,
-          transparent 1px 3px
-        );
+      background:radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,.55) 100%);
     }
 
-    /* Vignette + faint flicker, like curved CRT glass */
-    .crt-glass{
-      position:fixed;
-      inset:0;
-      z-index:2001;
-      pointer-events:none;
-      background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.75) 100%);
-      animation: flicker 0.15s infinite;
-    }
-
-    @keyframes flicker {
-      0%, 100% { opacity: 1; }
-      50%      { opacity: .94; }
-    }
-
-    /* Slow rolling bright band */
-    .scanbar{
-      position:fixed;
-      left:0;
-      right:0;
-      top:-20%;
-      height:20%;
-      z-index:2002;
-      pointer-events:none;
-      background:linear-gradient(to bottom, transparent, rgba(25,255,94,.06), transparent);
-      animation: roll 7s linear infinite;
-    }
-
-    @keyframes roll {
-      to { top: 110%; }
-    }
-
+    /* ---------- WELCOME BOX ---------- */
     .wrap{
       position:relative;
       z-index:1;
@@ -108,28 +110,36 @@
       place-items:center;
       text-align:center;
       padding:40px;
+      opacity:0;
+      transform:scale(.95);
+      transition:opacity 1.1s ease .25s, transform 1.4s cubic-bezier(.2,.8,.2,1) .25s;
     }
-
-    @supports (height: 100svh){
-      .wrap{ height:100svh; }
-    }
+    @supports (height: 100svh){ .wrap{ height:100svh; } }
+    body.ready .wrap{ opacity:1; transform:none; }
 
     .card{
       width:min(92vw,var(--maxw));
-      background:rgba(0,0,0,.6);
-      border:1px solid rgba(25,255,94,.35);
-      border-radius:6px;               /* squarer, like an LCD bezel */
-      box-shadow:
-        0 0 24px rgba(25,255,94,.2) inset,
-        0 0 40px rgba(0,0,0,.6);
+      border-radius:6px;
       padding:40px;
+      border:1px solid rgba(255,255,255,.4);
+      background:
+        linear-gradient(160deg,
+          rgba(255,255,255,.16) 0%,
+          rgba(255,255,255,.04) 45%,
+          rgba(255,255,255,.02) 65%,
+          rgba(255,255,255,.10) 100%),
+        rgba(0,0,0,.55);
+      backdrop-filter:blur(2px);
+      box-shadow:
+        0 0 24px rgba(255,255,255,.10) inset,
+        0 0 40px rgba(255,255,255,.06),
+        0 20px 60px rgba(0,0,0,.7);
     }
 
-    /* Terminal prompt line above the title */
     .prompt{
       font-size:clamp(16px,2.6vw,22px);
       letter-spacing:2px;
-      color:rgba(25,255,94,.6);
+      color:rgba(255,255,255,.55);
       text-align:left;
       margin-bottom:14px;
     }
@@ -139,38 +149,32 @@
       line-height:.9;
       letter-spacing:4px;
       text-transform:uppercase;
-      color:var(--crt-green);
-      text-shadow:
-        -2px 0 rgba(255,40,80,.35),
-         2px 0 rgba(40,160,255,.35),
-         0 0 6px rgba(25,255,94,.9),
-         0 0 18px rgba(25,255,94,.5),
-         0 0 32px rgba(25,255,94,.35);
-      -webkit-text-stroke:2px rgba(0,0,0,.6);
+      color:#fff;
+      background:linear-gradient(180deg, #ffffff 0%, #ffffff 45%, #bdbdbd 100%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      -webkit-text-fill-color:transparent;
+      filter:drop-shadow(0 0 8px rgba(255,255,255,.45)) drop-shadow(0 0 24px rgba(255,255,255,.18));
       margin-bottom:18px;
     }
 
-    /* Blinking block cursor */
     .cursor{
       display:inline-block;
       width:.5em;
       height:.8em;
       margin-left:.1em;
       vertical-align:baseline;
-      background:var(--crt-green);
-      box-shadow:0 0 12px rgba(25,255,94,.8);
-      animation: blink 1s steps(1) infinite;
+      background:#fff;
+      box-shadow:0 0 12px rgba(255,255,255,.8);
+      animation:blink 1s steps(1) infinite;
     }
-
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
+    @keyframes blink{ 50%{ opacity:0; } }
 
     .subtitle{
       font-size:clamp(16px,3.2vw,26px);
       letter-spacing:4px;
       text-transform:uppercase;
-      color:#a9ffc7;
+      color:#d6d6d6;
       opacity:.9;
       margin-bottom:28px;
       min-height:1.2em;
@@ -192,110 +196,92 @@
       display:grid;
       grid-auto-flow:column;
       place-items:center;
-      color:var(--crt-green);
+      color:#000;
       font-size:22px;
       letter-spacing:2px;
       text-transform:uppercase;
-      border:1px solid rgba(25,255,94,.4);
-      background:rgba(0,0,0,.65);
+      border:1px solid rgba(255,255,255,.8);
+      background:linear-gradient(180deg, #ffffff 0%, #e4e4e4 45%, #a9a9a9 100%);
       box-shadow:
-        0 0 14px rgba(25,255,94,.25) inset,
-        0 0 18px rgba(25,255,94,.18);
-      transition:
-        transform .12s ease,
-        box-shadow .2s ease,
-        border-color .2s ease;
+        0 0 14px rgba(255,255,255,.18),
+        0 1px 0 rgba(255,255,255,.9) inset;
+      transition:transform .12s ease, box-shadow .2s ease, filter .2s ease;
       touch-action:manipulation;
     }
 
-    .btn::before{ content:"[ "; opacity:.5; }
-    .btn::after { content:" ]"; opacity:.5; }
+    .btn::before{ content:"[ "; opacity:.45; }
+    .btn::after { content:" ]"; opacity:.45; }
 
     .btn:hover,
     .btn:focus-visible{
-      transform:translateY(-1px);
-      color:#000;
-      background:var(--crt-green);
-      border-color:var(--crt-green);
       outline:none;
+      transform:translateY(-2px);
+      filter:brightness(1.08);
       box-shadow:
-        0 0 18px rgba(25,255,94,.6),
-        0 0 36px rgba(25,255,94,.35);
+        0 0 18px rgba(255,255,255,.55),
+        0 0 40px rgba(255,255,255,.25),
+        0 1px 0 #fff inset;
     }
 
-    /* Mobile menu */
+    /* ---------- MOBILE ---------- */
     .mobile-topbar,
-    .mobile-menu{
-      display:none;
-    }
+    .mobile-menu{ display:none; }
 
     @media (max-width: 640px){
-      :root{
-        --maxw:560px;
-      }
-
+      :root{ --maxw:560px; }
       body{ overflow:auto; }
 
       .mobile-topbar{
         position:fixed;
-        top:0;
-        left:0;
-        right:0;
+        top:0; left:0; right:0;
         z-index:1000;
         height:56px;
         display:flex;
         align-items:center;
         justify-content:space-between;
         padding:0 14px;
-        background:rgba(0,0,0,.7);
-        border-bottom:1px solid rgba(25,255,94,.35);
+        background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.02)), rgba(0,0,0,.75);
+        border-bottom:1px solid var(--line);
         box-shadow:0 6px 16px rgba(0,0,0,.5);
         backdrop-filter:blur(6px);
+        opacity:0;
+        transition:opacity .8s ease .4s;
       }
+      body.ready .mobile-topbar{ opacity:1; }
 
       .brand{
-        color:var(--crt-green);
+        color:#fff;
         font-size:24px;
         letter-spacing:3px;
         text-transform:uppercase;
-        text-shadow:
-          0 0 6px rgba(25,255,94,.7),
-          0 0 16px rgba(25,255,94,.3);
+        text-shadow:0 0 8px rgba(255,255,255,.5);
       }
 
       .hamburger{
         width:44px;
         height:44px;
         border-radius:4px;
-        border:1px solid rgba(25,255,94,.45);
-        background:rgba(0,0,0,.85);
-        color:var(--text);
+        border:1px solid rgba(255,255,255,.8);
+        background:linear-gradient(180deg, #ffffff, #b5b5b5);
+        color:#000;
         font-size:22px;
         cursor:pointer;
         display:grid;
         place-items:center;
-        box-shadow:
-          0 0 12px rgba(25,255,94,.22) inset,
-          0 0 22px rgba(25,255,94,.16);
       }
 
       .mobile-menu{
         position:fixed;
-        top:56px;
-        left:0;
-        right:0;
+        top:56px; left:0; right:0;
         z-index:999;
         display:block;
         transform:translateY(-110%);
         transition:transform .22s ease;
-        background:rgba(0,0,0,.9);
-        border-bottom:1px solid rgba(25,255,94,.35);
+        background:rgba(0,0,0,.92);
+        border-bottom:1px solid var(--line);
         backdrop-filter:blur(6px);
       }
-
-      .mobile-menu.open{
-        transform:translateY(0);
-      }
+      .mobile-menu.open{ transform:translateY(0); }
 
       .menu-grid{
         display:grid;
@@ -310,41 +296,19 @@
         place-items:center;
         text-decoration:none;
         border-radius:4px;
-        border:1px solid rgba(25,255,94,.35);
-        color:var(--crt-green);
+        border:1px solid rgba(255,255,255,.8);
+        color:#000;
         font-size:18px;
         letter-spacing:2px;
         text-transform:uppercase;
-        background:rgba(0,0,0,.65);
-        box-shadow:
-          0 0 10px rgba(25,255,94,.18) inset,
-          0 0 18px rgba(0,0,0,.45);
+        background:linear-gradient(180deg, #ffffff 0%, #e4e4e4 45%, #a9a9a9 100%);
       }
 
-      .wrap{
-        padding:20px;
-        padding-top:84px;
-      }
-
-      .card{
-        padding:24px 18px;
-      }
-
-      h1{
-        -webkit-text-stroke:1px rgba(0,0,0,.65);
-        letter-spacing:2px;
-        margin-bottom:14px;
-      }
-
-      .subtitle{
-        letter-spacing:2px;
-        margin-bottom:22px;
-      }
-
-      .cta{
-        gap:12px;
-      }
-
+      .wrap{ padding:20px; padding-top:84px; }
+      .card{ padding:24px 18px; }
+      h1{ letter-spacing:2px; margin-bottom:14px; }
+      .subtitle{ letter-spacing:2px; margin-bottom:22px; }
+      .cta{ gap:12px; }
       .btn{
         width:calc(50% - 6px);
         min-width:140px;
@@ -352,24 +316,26 @@
         font-size:20px;
         padding:0 18px;
       }
-
-      .scanlines{ opacity:.09; }
     }
 
-    /* Respect people who turn off motion */
     @media (prefers-reduced-motion: reduce){
-      .crt-glass, .scanbar, .cursor{ animation:none; }
-      .scanbar{ display:none; }
+      .cursor{ animation:none; }
+      .wrap, .mobile-topbar{ transition:none; }
     }
   </style>
 </head>
 
 <body>
-  <canvas id="snake" aria-hidden="true"></canvas>
-  <div class="lcd-glow" aria-hidden="true"></div>
-  <div class="scanlines" aria-hidden="true"></div>
-  <div class="crt-glass" aria-hidden="true"></div>
-  <div class="scanbar" aria-hidden="true"></div>
+  <!-- Hyperspace intro -->
+  <div id="intro" class="intro" aria-hidden="true">
+    <canvas id="hyperspace"></canvas>
+    <div class="intro-text">Jumping to hyperspace</div>
+    <div class="intro-skip">Click or press any key to skip</div>
+    <div class="flash"></div>
+  </div>
+
+  <canvas id="stars" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
 
   <!-- Mobile header -->
   <header class="mobile-topbar">
@@ -405,171 +371,266 @@
   </main>
 
   <script>
+    const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     /* Mobile menu */
     (function(){
       const btn = document.getElementById('hamburger');
       const menu = document.getElementById('mobileMenu');
       if(!btn || !menu) return;
       btn.onclick = () => menu.classList.toggle('open');
-      menu.onclick = e => {
-        if(e.target.closest('a')) menu.classList.remove('open');
-      };
+      menu.onclick = e => { if(e.target.closest('a')) menu.classList.remove('open'); };
     })();
 
-    /* Typewriter effect on the subtitle */
+    /* Typewriter on the subtitle, starts after the jump */
     (function(){
       const el = document.getElementById('subtitle');
-      if(!el || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if(!el || REDUCED) return;
       const text = el.textContent;
       el.textContent = '';
-      let i = 0;
-      setTimeout(function type(){
-        el.textContent = text.slice(0, ++i);
-        if(i < text.length) setTimeout(type, 45 + Math.random() * 60);
-      }, 900);
+      document.addEventListener('hub:ready', () => {
+        let i = 0;
+        setTimeout(function type(){
+          el.textContent = text.slice(0, ++i);
+          if(i < text.length) setTimeout(type, 45 + Math.random() * 60);
+        }, 700);
+      }, { once:true });
     })();
 
-    /* Snake LCD background: discrete grid steps, no smooth motion */
+    /* Hyperspace jump intro (white streaks) */
     (function(){
-      const canvas = document.getElementById('snake');
+      const intro = document.getElementById('intro');
+      let revealed = false;
+      function reveal(){
+        if(revealed) return;
+        revealed = true;
+        document.body.classList.add('ready');
+        document.dispatchEvent(new Event('hub:ready'));
+      }
+
+      if(REDUCED){ intro.remove(); reveal(); return; }
+
+      const canvas = document.getElementById('hyperspace');
       const ctx = canvas.getContext('2d');
-      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const DURATION = 3.2;
+      let w, h, cx, cy, D, F, stars = [];
+      let start = null, last = null, done = false;
 
-      const OFF   = 'rgba(25,255,94,0.07)';  // unlit LCD pixel
-      const ON    = '#19ff5e';               // lit pixel
-      const HEAD  = '#b8ffcf';
-      const TICK  = 110;                     // ms per frame (Nokia-ish speed)
-      const MAX_LEN = 70;
-
-      let cell, cols, rows, w, h;
-      let snake, dir, food, grow, dying, frame = 0, timer;
-
-      const rand = n => Math.floor(Math.random() * n);
-      const wrap = (v, m) => (v + m) % m;
-      const wdist = (a, b, m) => { const d = Math.abs(a - b); return Math.min(d, m - d); };
-      const occupied = (x, y, skipTail) => {
-        const end = skipTail ? snake.length - 1 : snake.length;
-        for(let i = 0; i < end; i++) if(snake[i].x === x && snake[i].y === y) return true;
-        return false;
-      };
+      function spawn(anyDepth){
+        return {
+          x: (Math.random() * 2 - 1) * w,
+          y: (Math.random() * 2 - 1) * h,
+          z: anyDepth ? Math.random() * D + 1 : D,
+          b: 200 + Math.floor(Math.random() * 56)   // slight brightness variation, all white/grey
+        };
+      }
 
       function resize(){
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
         w = innerWidth; h = innerHeight;
-        cell = w <= 640 ? 16 : 22;
-        canvas.width = w * dpr;
-        canvas.height = h * dpr;
-        canvas.style.width = w + 'px';
-        canvas.style.height = h + 'px';
+        canvas.width = w * dpr; canvas.height = h * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        cols = Math.ceil(w / cell);
-        rows = Math.ceil(h / cell);
-        reset();
-        draw();
+        cx = w / 2; cy = h / 2;
+        D = Math.max(w, h);
+        F = D * 0.5;
+        const n = Math.round(Math.min(1000, Math.max(350, w * h / 1300)));
+        stars = Array.from({ length:n }, () => spawn(true));
       }
 
-      function reset(){
-        const x = Math.floor(cols / 5), y = Math.floor(rows * 0.75);
-        snake = [];
-        for(let i = 0; i < 6; i++) snake.push({ x: x - i, y });
-        dir = { x: 1, y: 0 };
-        grow = 0;
-        dying = 0;
-        placeFood();
+      function speedAt(t){
+        if(t < 0.6) return D * 0.04;
+        const k = Math.min(1, (t - 0.6) / 1.1);
+        return D * (0.04 + 3.4 * k * k * k);
       }
 
-      function placeFood(){
-        do { food = { x: rand(cols), y: rand(rows) }; }
-        while(occupied(food.x, food.y));
-      }
+      const project = (s, z) => [cx + s.x * (F / z), cy + s.y * (F / z)];
 
-      // Simple greedy "player": head toward food, never reverse, avoid own body
-      function chooseDir(){
-        const head = snake[0];
-        const options = [{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}]
-          .filter(d => !(d.x === -dir.x && d.y === -dir.y));
-        let best = null, bestScore = Infinity;
-        for(const d of options){
-          const nx = wrap(head.x + d.x, cols), ny = wrap(head.y + d.y, rows);
-          if(occupied(nx, ny, true)) continue;
-          let score = wdist(nx, food.x, cols) + wdist(ny, food.y, rows);
-          if(d.x === dir.x && d.y === dir.y) score -= 0.5;  // prefer going straight
-          score += Math.random() * 0.8;                      // a little human wobble
-          if(score < bestScore){ bestScore = score; best = d; }
-        }
-        return best;
-      }
+      function frame(now){
+        if(done) return;
+        if(start === null){ start = last = now; }
+        const t = (now - start) / 1000;
+        const dt = Math.min(0.05, (now - last) / 1000);
+        last = now;
 
-      function step(){
-        frame++;
-        if(dying){
-          // Classic game-over blink, then restart
-          if(--dying === 0) reset();
-          draw();
-          return;
-        }
-        const d = chooseDir();
-        if(!d){ dying = 8; draw(); return; }
-        dir = d;
-        const head = { x: wrap(snake[0].x + dir.x, cols), y: wrap(snake[0].y + dir.y, rows) };
-        snake.unshift(head);
-        if(head.x === food.x && head.y === food.y){
-          grow += 3;
-          placeFood();
-        }
-        if(grow > 0) grow--; else snake.pop();
-        if(snake.length >= MAX_LEN) dying = 8;
-        draw();
-      }
+        const v = speedAt(t);
+        const intensity = Math.min(1, Math.max(0, (t - 0.6) / 1.1));
 
-      function pixel(x, y, color, inset){
-        ctx.fillStyle = color;
-        ctx.fillRect(x * cell + inset, y * cell + inset, cell - inset * 2, cell - inset * 2);
-      }
-
-      function draw(){
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, w, h);
 
-        // Unlit LCD cells: the faint ghost grid
-        const gap = Math.max(2, Math.round(cell * 0.12));
-        ctx.fillStyle = OFF;
-        for(let y = 0; y < rows; y++){
-          for(let x = 0; x < cols; x++){
-            ctx.fillRect(x * cell + gap, y * cell + gap, cell - gap * 2, cell - gap * 2);
+        if(intensity > 0){
+          const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, D * 0.7);
+          g.addColorStop(0, `rgba(255,255,255,${0.16 * intensity})`);
+          g.addColorStop(0.35, `rgba(255,255,255,${0.05 * intensity})`);
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, w, h);
+        }
+
+        ctx.lineCap = 'round';
+        for(const s of stars){
+          s.z -= v * dt;
+          if(s.z < 1){ Object.assign(s, spawn(false)); continue; }
+
+          const [hx, hy] = project(s, s.z);
+          if(hx < -50 || hx > w + 50 || hy < -50 || hy > h + 50){
+            Object.assign(s, spawn(false));
+            continue;
           }
+          const tailZ = Math.min(D, s.z + v * 0.085 + 4);
+          const [tx, ty] = project(s, tailZ);
+
+          const near = 1 - s.z / D;
+          const alpha = Math.min(1, near * 1.5 + 0.12);
+          ctx.strokeStyle = `rgba(${s.b},${s.b},${s.b},${alpha})`;
+          ctx.lineWidth = Math.max(0.6, near * 2.8);
+          ctx.beginPath();
+          ctx.moveTo(tx, ty);
+          ctx.lineTo(hx, hy);
+          ctx.stroke();
         }
 
-        // Food: a tiny 4-pixel diamond inside one cell, blinking
-        if(frame % 6 < 4){
-          const s = Math.floor(cell / 3), ox = food.x * cell, oy = food.y * cell;
-          ctx.fillStyle = ON;
-          ctx.fillRect(ox + s,     oy,         s, s);
-          ctx.fillRect(ox,         oy + s,     s, s);
-          ctx.fillRect(ox + 2 * s, oy + s,     s, s);
-          ctx.fillRect(ox + s,     oy + 2 * s, s, s);
+        if(t >= DURATION){ finish(); return; }
+        requestAnimationFrame(frame);
+      }
+
+      function finish(){
+        if(done) return;
+        done = true;
+        intro.classList.add('done');
+        reveal();
+        setTimeout(() => intro.remove(), 1500);
+      }
+
+      addEventListener('resize', () => { if(!done) resize(); });
+      intro.addEventListener('click', finish);
+      intro.addEventListener('touchstart', finish, { passive:true });
+      addEventListener('keydown', finish, { once:true });
+
+      resize();
+      requestAnimationFrame(frame);
+    })();
+
+    /* Dense deep-space starfield, like a long-exposure night sky */
+    (function(){
+      const canvas = document.getElementById('stars');
+      const ctx = canvas.getContext('2d');
+      const base = document.createElement('canvas');   // static stars drawn once
+      const bctx = base.getContext('2d');
+      let w, h, dpr, twinklers = [];
+
+      function rand(a, b){ return a + Math.random() * (b - a); }
+
+      // Distance from a faint horizontal "milky" band through the middle
+      function bandWeight(y){
+        const d = (y - h * 0.48) / (h * 0.22);
+        return Math.exp(-d * d);
+      }
+
+      function dot(c, x, y, r, a){
+        c.fillStyle = `rgba(255,255,255,${a})`;
+        c.beginPath();
+        c.arc(x, y, r, 0, Math.PI * 2);
+        c.fill();
+      }
+
+      function build(){
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        w = innerWidth; h = innerHeight;
+        for(const c of [canvas, base]){ c.width = w * dpr; c.height = h * dpr; }
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        bctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        bctx.fillStyle = '#000';
+        bctx.fillRect(0, 0, w, h);
+
+        // Very faint haze along the band, kept neutral grey
+        const haze = bctx.createLinearGradient(0, h * 0.2, 0, h * 0.8);
+        haze.addColorStop(0, 'rgba(255,255,255,0)');
+        haze.addColorStop(0.5, 'rgba(255,255,255,0.025)');
+        haze.addColorStop(1, 'rgba(255,255,255,0)');
+        bctx.fillStyle = haze;
+        bctx.fillRect(0, 0, w, h);
+
+        const area = w * h;
+
+        // Dust: lots of tiny faint stars, denser in the band
+        const dust = Math.round(area / 350);
+        for(let i = 0; i < dust; i++){
+          const x = Math.random() * w, y = Math.random() * h;
+          if(Math.random() > 0.35 + 0.65 * bandWeight(y)) continue;
+          dot(bctx, x, y, rand(0.25, 0.6), rand(0.25, 0.7));
         }
 
-        // Snake: hidden on alternate frames while "dying"
-        if(dying && dying % 2) return;
-        ctx.shadowColor = 'rgba(25,255,94,0.7)';
-        ctx.shadowBlur = 8;
-        for(let i = snake.length - 1; i >= 0; i--){
-          pixel(snake[i].x, snake[i].y, i === 0 ? HEAD : ON, gap);
+        // Small stars
+        const small = Math.round(area / 1400);
+        for(let i = 0; i < small; i++){
+          dot(bctx, Math.random() * w, Math.random() * h, rand(0.6, 1.1), rand(0.6, 1));
         }
-        ctx.shadowBlur = 0;
+
+        // A few bright stars with a soft glow
+        twinklers = [];
+        const bright = Math.round(area / 14000);
+        for(let i = 0; i < bright; i++){
+          const s = {
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: rand(1.3, 2.6),
+            phase: Math.random() * Math.PI * 2,
+            speed: rand(0.6, 1.8)
+          };
+          twinklers.push(s);
+        }
+
+        // Also let a share of the small stars twinkle
+        const smallTw = Math.round(area / 6000);
+        for(let i = 0; i < smallTw; i++){
+          twinklers.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: rand(0.7, 1.2),
+            phase: Math.random() * Math.PI * 2,
+            speed: rand(1, 3)
+          });
+        }
+
+        render(0);
+      }
+
+      function render(now){
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.drawImage(base, 0, 0);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const t = now / 1000;
+        for(const s of twinklers){
+          const tw = REDUCED ? 1 : 0.6 + 0.4 * Math.sin(t * s.speed + s.phase);
+          if(s.r > 1.25){
+            const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 4);
+            g.addColorStop(0, `rgba(255,255,255,${0.35 * tw})`);
+            g.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.r * 4, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          dot(ctx, s.x, s.y, s.r, tw);
+        }
+      }
+
+      function loop(now){
+        render(now);
+        requestAnimationFrame(loop);
       }
 
       let resizeTimer;
       addEventListener('resize', () => {
         clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(resize, 150);
+        resizeTimer = setTimeout(build, 150);
       });
 
-      resize();
-      if(!reduced){
-        timer = setInterval(() => { if(!document.hidden) step(); }, TICK);
-      }
+      build();
+      if(!REDUCED) requestAnimationFrame(loop);
     })();
   </script>
 </body>
